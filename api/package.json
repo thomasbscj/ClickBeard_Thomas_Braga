@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "build" : "npx tsc",
+    "run" : "node ./dist/main.js"
+  },
+  "dependencies": {
+    "typescript": "^6.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0"
+  }
+}
