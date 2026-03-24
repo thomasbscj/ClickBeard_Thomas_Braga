@@ -18,6 +18,7 @@ class AppointmentRepository implements IAppointmentRepository {
         userId: appointment.userId,
         barberId: appointment.barberId,
         datetime: appointment.datetime,
+        active: true,
       },
     });
   }
@@ -38,6 +39,7 @@ class AppointmentRepository implements IAppointmentRepository {
       userId: appointment.userId,
       barberId: appointment.barberId,
       datetime: appointment.datetime,
+      active: appointment.active,
     };
   }
 
@@ -49,6 +51,7 @@ class AppointmentRepository implements IAppointmentRepository {
       userId: appointment.userId,
       barberId: appointment.barberId,
       datetime: appointment.datetime,
+      active: appointment.active,
     }));
   }
 
@@ -61,6 +64,7 @@ class AppointmentRepository implements IAppointmentRepository {
         userId: appointment.userId,
         barberId: appointment.barberId,
         datetime: appointment.datetime,
+        active: appointment.active,
       },
     });
 
@@ -69,6 +73,7 @@ class AppointmentRepository implements IAppointmentRepository {
       userId: updatedAppointment.userId,
       barberId: updatedAppointment.barberId,
       datetime: updatedAppointment.datetime,
+      active: updatedAppointment.active,
     };
   }
 

@@ -17,7 +17,12 @@ export const barberRouter = Router();
 barberRouter.post("/", async (req: Request, res: Response) => {
   try {
     const validatedData = validateBarberCreate(req.body);
-    const barber = await barberService.createBarber(validatedData as Barber);
+    const barber = await barberService.createBarber({
+      name: validatedData.name,
+      specialtyId: validatedData.specialtyId,
+      bornAt: validatedData.bornAt,
+      hiredAt: new Date(validatedData.hiredAt),
+    });
     res.status(201).json(barber);
   } catch (error) {
     if (handleValidationError(error, res)) return;
@@ -58,7 +63,10 @@ barberRouter.put("/:id", async (req: Request, res: Response) => {
       id: id,
       ...req.body,
     });
-    const barber = await barberService.updateBarber(validatedData as Barber);
+    const barber = await barberService.updateBarber({
+      ...validatedData,
+      hiredAt: new Date(validatedData.hiredAt),
+    });
     res.status(200).json(barber);
   } catch (error) {
     if (handleValidationError(error, res)) return;

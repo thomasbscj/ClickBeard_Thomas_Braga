@@ -1,9 +1,9 @@
-import { Barber } from "./barber.model";
+import { Barber, BarberCreateInput } from "./barber.model";
 import { barberRepository } from "./barber.repository";
 import type { IBarberRepository } from "./barber.repository";
 
 interface IBarberService {
-  createBarber(barber: Barber): Promise<Barber>;
+  createBarber(barber: BarberCreateInput): Promise<Barber>;
   getBarberById(id: number): Promise<Barber>;
   getAllBarbers(): Promise<Barber[]>;
   updateBarber(barber: Barber): Promise<Barber>;
@@ -13,7 +13,7 @@ interface IBarberService {
 class BarberService implements IBarberService {
   constructor(private barberRepository: IBarberRepository) {}
 
-  async createBarber(barber: Barber): Promise<Barber> {
+  async createBarber(barber: BarberCreateInput): Promise<Barber> {
     return this.barberRepository.createBarber(barber);
   }
 

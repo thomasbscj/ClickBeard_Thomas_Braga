@@ -8,6 +8,10 @@ interface IAppointmentService {
   getAllAppointments(): Promise<Appointment[]>;
   updateAppointment(appointment: Appointment): Promise<Appointment>;
   deleteAppointmentById(id: number): Promise<void>;
+  cancelAppointment(
+    appointmentId: number,
+    userId: number,
+  ): Promise<Appointment>;
 }
 
 class AppointmentService implements IAppointmentService {
@@ -129,6 +133,23 @@ class AppointmentService implements IAppointmentService {
 
   async deleteAppointmentById(id: number): Promise<void> {
     return this.appointmentRepository.deleteAppointmentById(id);
+  }
+
+  async cancelAppointment(
+    appointmentId: number,
+    userId: number,
+  ): Promise<Appointment> {
+    const appointment =
+      await this.appointmentRepository.getAppointmentById(appointmentId);
+
+    if (appointment.userId !== userId) {
+      throw new Error("You can only cancel your own appointments");
+    }
+
+    return this.appointmentRepository.updateAppointment({
+      ...appointment,
+      active: false,
+    });
   }
 }
 

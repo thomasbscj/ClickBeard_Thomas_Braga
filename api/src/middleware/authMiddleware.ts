@@ -1,15 +1,26 @@
 import { Request, Response, NextFunction } from "express";
 import { authService } from "../auth/auth.service";
 
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        id: number;
+        role: string;
+      };
+    }
+  }
+}
+
 export interface AuthenticatedRequest extends Request {
-  user?: {
+  user: {
     id: number;
     role: string;
   };
 }
 
 export const authMiddleware = (
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ) => {

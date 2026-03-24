@@ -1,8 +1,8 @@
-import { Barber } from "./barber.model";
+import { Barber, BarberCreateInput } from "./barber.model";
 import { db } from "../repository/repository";
 
 export interface IBarberRepository {
-  createBarber(barber: Barber): Promise<Barber>;
+  createBarber(barber: BarberCreateInput): Promise<Barber>;
   getBarberById(id: number): Promise<Barber>;
   getAllBarbers(): Promise<Barber[]>;
   updateBarber(barber: Barber): Promise<Barber>;
@@ -12,11 +12,13 @@ export interface IBarberRepository {
 class BarberRepository implements IBarberRepository {
   constructor() {}
 
-  async createBarber(barber: Barber): Promise<Barber> {
+  async createBarber(barber: BarberCreateInput): Promise<Barber> {
     return db.barber.create({
       data: {
         name: barber.name,
         specialtyId: barber.specialtyId,
+        bornAt: barber.bornAt,
+        hiredAt: barber.hiredAt,
       },
     });
   }
@@ -36,6 +38,8 @@ class BarberRepository implements IBarberRepository {
       id: barber.id,
       name: barber.name,
       specialtyId: barber.specialtyId,
+      bornAt: barber.bornAt,
+      hiredAt: barber.hiredAt,
     };
   }
 
@@ -46,6 +50,8 @@ class BarberRepository implements IBarberRepository {
       id: barber.id,
       name: barber.name,
       specialtyId: barber.specialtyId,
+      bornAt: barber.bornAt,
+      hiredAt: barber.hiredAt,
     }));
   }
 
@@ -57,6 +63,8 @@ class BarberRepository implements IBarberRepository {
       data: {
         name: barber.name,
         specialtyId: barber.specialtyId,
+        bornAt: barber.bornAt,
+        hiredAt: new Date(barber.hiredAt),
       },
     });
 
@@ -64,6 +72,8 @@ class BarberRepository implements IBarberRepository {
       id: updatedBarber.id,
       name: updatedBarber.name,
       specialtyId: updatedBarber.specialtyId,
+      bornAt: updatedBarber.bornAt,
+      hiredAt: updatedBarber.hiredAt,
     };
   }
 

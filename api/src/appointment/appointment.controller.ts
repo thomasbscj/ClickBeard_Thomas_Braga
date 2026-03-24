@@ -85,3 +85,33 @@ appointmentRouter.delete("/:id", async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to delete appointment" });
   }
 });
+
+// Cancel Appointment (set active to false)
+appointmentRouter.post("/:id/cancel", async (req: Request, res: Response) => {
+  try {
+    const id = parseIntParam(req.params.id);
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    const appointment = await appointmentService.cancelAppointment(id, userId);
+    res.status(200).json(appointment);
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === "You can only cancel your own appointments"
+    ) {
+      res.status(403).json({ error: error.message });
+      return;
+    }
+    if (error instanceof Error && error.message === "Appointment not found") {
+      res.status(404).json({ error: error.message });
+      return;
+    }
+    console.error("Error canceling appointment:", error);
+    res.status(500).json({ error: "Failed to cancel appointment" });
+  }
+});

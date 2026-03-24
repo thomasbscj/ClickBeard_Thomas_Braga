@@ -37,6 +37,8 @@ model Barber {
   name         String        @unique
   specialty    Specialty     @relation(fields: [specialtyId], references: [name])
   specialtyId  String
+  bornAt Int 
+  hiredAt DateTime
   appointments Appointment[]
 }
 
@@ -46,5 +48,6 @@ model Appointment {
   userId   Int
   barber   Barber   @relation(fields: [barberId], references: [id])
   barberId Int
+  active Boolean
   datetime DateTime
 }

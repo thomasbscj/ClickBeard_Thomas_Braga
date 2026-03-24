@@ -5,6 +5,7 @@ export type Appointment = {
   userId: number;
   barberId: number;
   datetime: Date;
+  active: boolean;
 };
 
 export const appointmentCreateDto = z.object({
