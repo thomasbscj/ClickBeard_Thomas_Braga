@@ -10,26 +10,10 @@ import {
   handleNotFoundError,
 } from "../utils/errorHandler";
 import { parseIntParam } from "../utils/paramParser";
+import { adminMiddleware } from "../middleware/adminMiddleware";
 
 export const barberRouter = Router();
 
-// Create Barber
-barberRouter.post("/", async (req: Request, res: Response) => {
-  try {
-    const validatedData = validateBarberCreate(req.body);
-    const barber = await barberService.createBarber({
-      name: validatedData.name,
-      specialtyId: validatedData.specialtyId,
-      bornAt: validatedData.bornAt,
-      hiredAt: new Date(validatedData.hiredAt),
-    });
-    res.status(201).json(barber);
-  } catch (error) {
-    if (handleValidationError(error, res)) return;
-    console.error("Error creating barber:", error);
-    res.status(500).json({ error: "Failed to create barber" });
-  }
-});
 
 // Get Barber by ID
 barberRouter.get("/:id", async (req: Request, res: Response) => {
@@ -54,6 +38,25 @@ barberRouter.get("/", async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to get barbers" });
   }
 });
+
+barberRouter.use(adminMiddleware)
+barberRouter.post("/", async (req: Request, res: Response) => {
+  try {
+    const validatedData = validateBarberCreate(req.body);
+    const barber = await barberService.createBarber({
+      name: validatedData.name,
+      specialtyId: validatedData.specialtyId,
+      bornAt: validatedData.bornAt,
+      hiredAt: new Date(validatedData.hiredAt),
+    });
+    res.status(201).json(barber);
+  } catch (error) {
+    if (handleValidationError(error, res)) return;
+    console.error("Error creating barber:", error);
+    res.status(500).json({ error: "Failed to create barber" });
+  }
+});
+
 
 // Update Barber
 barberRouter.put("/:id", async (req: Request, res: Response) => {

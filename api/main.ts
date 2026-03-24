@@ -1,5 +1,5 @@
 import Express from "express";
-import { userRouter } from "./src/user/use.controller";
+import { userRouter } from "./src/user/user.controller";
 import { barberRouter } from "./src/barber/barber.controller";
 import { specialtyRouter } from "./src/specialty/specialty.controller";
 import { appointmentRouter } from "./src/appointment/appointment.controller";

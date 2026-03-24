@@ -10,6 +10,7 @@ import {
   handleNotFoundError,
 } from "../utils/errorHandler";
 import { parseIntParam } from "../utils/paramParser";
+import { adminMiddleware } from "../middleware/adminMiddleware";
 
 export const appointmentRouter = Router();
 
@@ -30,85 +31,6 @@ appointmentRouter.post("/", async (req: Request, res: Response) => {
   }
 });
 
-// Get Appointment by ID
-appointmentRouter.get("/:id", async (req: Request, res: Response) => {
-  try {
-    const id = parseIntParam(req.params.id);
-    const appointment = await appointmentService.getAppointmentById(id);
-    res.status(200).json(appointment);
-  } catch (error) {
-    if (handleNotFoundError(error, res, "Appointment")) return;
-    console.error("Error fetching appointment:", error);
-    res.status(500).json({ error: "Failed to get appointment" });
-  }
-});
-
-// Get All Appointments
-appointmentRouter.get("/", async (req: Request, res: Response) => {
-  try {
-    const appointments = await appointmentService.getAllAppointments();
-    res.status(200).json(appointments);
-  } catch (error) {
-    console.error("Error fetching appointments:", error);
-    res.status(500).json({ error: "Failed to get appointments" });
-  }
-});
-
-// Get My Appointments
-appointmentRouter.get(
-  "/my-appointments",
-  async (req: Request, res: Response) => {
-    try {
-      const userId = req.user?.id;
-
-      if (!userId) {
-        res.status(401).json({ error: "Unauthorized" });
-        return;
-      }
-
-      const appointments =
-        await appointmentService.getAppointmentsByUserId(userId);
-      res.status(200).json(appointments);
-    } catch (error) {
-      console.error("Error fetching user appointments:", error);
-      res.status(500).json({ error: "Failed to get appointments" });
-    }
-  },
-);
-
-// Update Appointment
-appointmentRouter.put("/:id", async (req: Request, res: Response) => {
-  try {
-    const id = parseIntParam(req.params.id);
-    const validatedData = validateAppointmentUpdate({
-      id: id,
-      ...req.body,
-    });
-    const appointment = await appointmentService.updateAppointment({
-      ...validatedData,
-      datetime: new Date(validatedData.datetime),
-    } as Appointment);
-    res.status(200).json(appointment);
-  } catch (error) {
-    if (handleValidationError(error, res)) return;
-    console.error("Error updating appointment:", error);
-    res.status(500).json({ error: "Failed to update appointment" });
-  }
-});
-
-// Delete Appointment
-appointmentRouter.delete("/:id", async (req: Request, res: Response) => {
-  try {
-    const id = parseIntParam(req.params.id);
-    await appointmentService.deleteAppointmentById(id);
-    res.status(204).send();
-  } catch (error) {
-    console.error("Error deleting appointment:", error);
-    res.status(500).json({ error: "Failed to delete appointment" });
-  }
-});
-
-// Cancel Appointment (set active to false)
 appointmentRouter.post("/:id/cancel", async (req: Request, res: Response) => {
   try {
     const id = parseIntParam(req.params.id);
@@ -142,5 +64,66 @@ appointmentRouter.post("/:id/cancel", async (req: Request, res: Response) => {
     }
     console.error("Error canceling appointment:", error);
     res.status(500).json({ error: "Failed to cancel appointment" });
+  }
+});
+
+// Get My Appointments
+appointmentRouter.get(
+  "/my-appointments",
+  async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+
+      if (!userId) {
+        res.status(401).json({ error: "Unauthorized" });
+        return;
+      }
+
+      const appointments =
+        await appointmentService.getAppointmentsByUserId(userId);
+      res.status(200).json(appointments);
+    } catch (error) {
+      console.error("Error fetching user appointments:", error);
+      res.status(500).json({ error: "Failed to get appointments" });
+    }
+  },
+);
+
+
+appointmentRouter.use(adminMiddleware)
+// Get Appointment by ID
+appointmentRouter.get("/:id", async (req: Request, res: Response) => {
+  try {
+    const id = parseIntParam(req.params.id);
+    const appointment = await appointmentService.getAppointmentById(id);
+    res.status(200).json(appointment);
+  } catch (error) {
+    if (handleNotFoundError(error, res, "Appointment")) return;
+    console.error("Error fetching appointment:", error);
+    res.status(500).json({ error: "Failed to get appointment" });
+  }
+});
+
+// Get All Appointments
+appointmentRouter.get("/", async (req: Request, res: Response) => {
+  try {
+    const appointments = await appointmentService.getAllAppointments();
+    res.status(200).json(appointments);
+  } catch (error) {
+    console.error("Error fetching appointments:", error);
+    res.status(500).json({ error: "Failed to get appointments" });
+  }
+});
+
+
+// Delete Appointment
+appointmentRouter.delete("/:id", async (req: Request, res: Response) => {
+  try {
+    const id = parseIntParam(req.params.id);
+    await appointmentService.deleteAppointmentById(id);
+    res.status(204).send();
+  } catch (error) {
+    console.error("Error deleting appointment:", error);
+    res.status(500).json({ error: "Failed to delete appointment" });
   }
 });

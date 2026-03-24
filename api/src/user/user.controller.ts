@@ -6,20 +6,11 @@ import {
   handleNotFoundError,
 } from "../utils/errorHandler";
 import { parseIntParam } from "../utils/paramParser";
+import { adminMiddleware } from "../middleware/adminMiddleware";
 
 export const userRouter = Router();
 
-userRouter.post("/", async (req: Request, res: Response) => {
-  try {
-    const validatedData = validateUserCreate(req.body);
-    const user = await userService.createUser(validatedData as User);
-    res.status(201).json(user);
-  } catch (error) {
-    if (handleValidationError(error, res)) return;
-    console.error("Error creating user:", error);
-    res.status(500).json({ error: "Failed to create user" });
-  }
-});
+userRouter.use(adminMiddleware)
 
 userRouter.get("/:id", async (req: Request, res: Response) => {
   try {

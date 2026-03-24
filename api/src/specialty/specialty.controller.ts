@@ -10,22 +10,9 @@ import {
   handleNotFoundError,
 } from "../utils/errorHandler";
 import { parseStringParam } from "../utils/paramParser";
+import { adminMiddleware } from "../middleware/adminMiddleware";
 
 export const specialtyRouter = Router();
-
-specialtyRouter.post("/", async (req: Request, res: Response) => {
-  try {
-    const validatedData = validateSpecialtyCreate(req.body);
-    const specialty = await specialtyService.createSpecialty(
-      validatedData as Specialty,
-    );
-    res.status(201).json(specialty);
-  } catch (error) {
-    if (handleValidationError(error, res)) return;
-    console.error("Error creating specialty:", error);
-    res.status(500).json({ error: "Failed to create specialty" });
-  }
-});
 
 specialtyRouter.get("/:name", async (req: Request, res: Response) => {
   try {
@@ -46,6 +33,22 @@ specialtyRouter.get("/", async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error fetching specialties:", error);
     res.status(500).json({ error: "Failed to get specialties" });
+  }
+});
+
+
+specialtyRouter.use(adminMiddleware)
+specialtyRouter.post("/", async (req: Request, res: Response) => {
+  try {
+    const validatedData = validateSpecialtyCreate(req.body);
+    const specialty = await specialtyService.createSpecialty(
+      validatedData as Specialty,
+    );
+    res.status(201).json(specialty);
+  } catch (error) {
+    if (handleValidationError(error, res)) return;
+    console.error("Error creating specialty:", error);
+    res.status(500).json({ error: "Failed to create specialty" });
   }
 });
 
