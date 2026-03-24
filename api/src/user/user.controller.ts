@@ -5,12 +5,12 @@ import {
   handleValidationError,
   handleNotFoundError,
 } from "../utils/errorHandler";
-import { parseIntParam } from "../utils/paramParser";
+import { parseIntParam, parsePaginationParams } from "../utils/paramParser";
 import { adminMiddleware } from "../middleware/adminMiddleware";
 
 export const userRouter = Router();
 
-userRouter.use(adminMiddleware)
+userRouter.use(adminMiddleware);
 
 userRouter.get("/:id", async (req: Request, res: Response) => {
   try {
@@ -26,8 +26,12 @@ userRouter.get("/:id", async (req: Request, res: Response) => {
 
 userRouter.get("/", async (req: Request, res: Response) => {
   try {
-    const users = await userService.getAllUsers();
-    res.status(200).json(users);
+    const { limit, offset } = parsePaginationParams(
+      req.query.limit,
+      req.query.offset,
+    );
+    const result = await userService.getAllUsers({ limit, offset });
+    res.status(200).json(result);
   } catch (error) {
     console.error("Error fetching users:", error);
     res.status(500).json({ error: "Failed to get users" });

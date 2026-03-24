@@ -1,11 +1,17 @@
 import { Appointment } from "./appointment.model";
 import { db } from "../repository/repository";
+import { PaginationParams, PaginatedResponse } from "../types/types";
 
 export interface IAppointmentRepository {
   createAppointment(appointment: Appointment): Promise<Appointment>;
   getAppointmentById(id: number): Promise<Appointment>;
-  getAllAppointments(): Promise<Appointment[]>;
-  getAppointmentsByUserId(userId: number): Promise<Appointment[]>;
+  getAllAppointments(
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<Appointment>>;
+  getAppointmentsByUserId(
+    userId: number,
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<Appointment>>;
   updateAppointment(appointment: Appointment): Promise<Appointment>;
   deleteAppointmentById(id: number): Promise<any>;
 }
@@ -44,32 +50,72 @@ class AppointmentRepository implements IAppointmentRepository {
     };
   }
 
-  async getAllAppointments(): Promise<Appointment[]> {
-    const appointments = await db.appointment.findMany();
+  async getAllAppointments(
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<Appointment>> {
+    const limit = pagination?.limit || 10;
+    const offset = pagination?.offset || 0;
 
-    return appointments.map((appointment) => ({
-      id: appointment.id,
-      userId: appointment.userId,
-      barberId: appointment.barberId,
-      datetime: appointment.datetime,
-      active: appointment.active,
-    }));
+    const [appointments, total] = await Promise.all([
+      db.appointment.findMany({
+        skip: offset,
+        take: limit,
+      }),
+      db.appointment.count(),
+    ]);
+
+    return {
+      data: appointments.map((appointment) => ({
+        id: appointment.id,
+        userId: appointment.userId,
+        barberId: appointment.barberId,
+        datetime: appointment.datetime,
+        active: appointment.active,
+      })),
+      pagination: {
+        limit,
+        offset,
+        total,
+      },
+    };
   }
 
-  async getAppointmentsByUserId(userId: number): Promise<Appointment[]> {
-    const appointments = await db.appointment.findMany({
-      where: {
-        userId: userId,
-      },
-    });
+  async getAppointmentsByUserId(
+    userId: number,
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<Appointment>> {
+    const limit = pagination?.limit || 10;
+    const offset = pagination?.offset || 0;
 
-    return appointments.map((appointment) => ({
-      id: appointment.id,
-      userId: appointment.userId,
-      barberId: appointment.barberId,
-      datetime: appointment.datetime,
-      active: appointment.active,
-    }));
+    const [appointments, total] = await Promise.all([
+      db.appointment.findMany({
+        where: {
+          userId: userId,
+        },
+        skip: offset,
+        take: limit,
+      }),
+      db.appointment.count({
+        where: {
+          userId: userId,
+        },
+      }),
+    ]);
+
+    return {
+      data: appointments.map((appointment) => ({
+        id: appointment.id,
+        userId: appointment.userId,
+        barberId: appointment.barberId,
+        datetime: appointment.datetime,
+        active: appointment.active,
+      })),
+      pagination: {
+        limit,
+        offset,
+        total,
+      },
+    };
   }
 
   async updateAppointment(appointment: Appointment): Promise<Appointment> {

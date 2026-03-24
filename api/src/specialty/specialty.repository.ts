@@ -1,10 +1,13 @@
 import { Specialty } from "./specialty.model";
 import { db } from "../repository/repository";
+import { PaginationParams, PaginatedResponse } from "../types/types";
 
 export interface ISpecialtyRepository {
   createSpecialty(specialty: Specialty): Promise<Specialty>;
   getSpecialtyByName(name: string): Promise<Specialty>;
-  getAllSpecialties(): Promise<Specialty[]>;
+  getAllSpecialties(
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<Specialty>>;
   updateSpecialty(specialty: Specialty): Promise<Specialty>;
   deleteSpecialtyByName(name: string): Promise<any>;
 }
@@ -38,13 +41,31 @@ class SpecialtyRepository implements ISpecialtyRepository {
     };
   }
 
-  async getAllSpecialties(): Promise<Specialty[]> {
-    const specialties = await db.specialty.findMany();
+  async getAllSpecialties(
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<Specialty>> {
+    const limit = pagination?.limit || 10;
+    const offset = pagination?.offset || 0;
 
-    return specialties.map((specialty) => ({
-      name: specialty.name,
-      description: specialty.description,
-    }));
+    const [specialties, total] = await Promise.all([
+      db.specialty.findMany({
+        skip: offset,
+        take: limit,
+      }),
+      db.specialty.count(),
+    ]);
+
+    return {
+      data: specialties.map((specialty) => ({
+        name: specialty.name,
+        description: specialty.description,
+      })),
+      pagination: {
+        limit,
+        offset,
+        total,
+      },
+    };
   }
 
   async updateSpecialty(specialty: Specialty): Promise<Specialty> {

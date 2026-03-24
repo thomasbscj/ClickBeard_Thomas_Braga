@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { Appointment } from "./appointment.model";
 import type { IAppointmentRepository } from "./appointment.repository";
 import { AppointmentService } from "./appointment.service";
+import type { PaginationParams, PaginatedResponse } from "../types/types";
 
 // Mock hardcoded do repositório de Appointment
 const mockAppointmentRepository: IAppointmentRepository = {
@@ -49,8 +50,10 @@ const mockAppointmentRepository: IAppointmentRepository = {
     throw new Error("Appointment not found");
   },
 
-  getAllAppointments: async (): Promise<Appointment[]> => {
-    return [
+  getAllAppointments: async (
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<Appointment>> => {
+    const allData = [
       {
         id: 1,
         userId: 1,
@@ -80,12 +83,67 @@ const mockAppointmentRepository: IAppointmentRepository = {
         active: false,
       },
     ];
+
+    const limit = pagination?.limit || 10;
+    const offset = pagination?.offset || 0;
+
+    return {
+      data: allData.slice(offset, offset + limit),
+      pagination: {
+        limit,
+        offset,
+        total: allData.length,
+      },
+    };
   },
 
-  getAppointmentsByUserId: async (userId: number): Promise<Appointment[]> => {
-    const allAppointments =
-      await mockAppointmentRepository.getAllAppointments();
-    return allAppointments.filter((apt) => apt.userId === userId);
+  getAppointmentsByUserId: async (
+    userId: number,
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<Appointment>> => {
+    const allData = [
+      {
+        id: 1,
+        userId: 1,
+        barberId: 1,
+        datetime: new Date("2026-03-25T10:00:00"),
+        active: true,
+      },
+      {
+        id: 2,
+        userId: 2,
+        barberId: 1,
+        datetime: new Date("2026-03-25T10:30:00"),
+        active: true,
+      },
+      {
+        id: 3,
+        userId: 1,
+        barberId: 2,
+        datetime: new Date("2026-03-25T14:00:00"),
+        active: true,
+      },
+      {
+        id: 4,
+        userId: 3,
+        barberId: 1,
+        datetime: new Date("2026-03-24T13:00:00"),
+        active: false,
+      },
+    ];
+
+    const filtered = allData.filter((apt) => apt.userId === userId);
+    const limit = pagination?.limit || 10;
+    const offset = pagination?.offset || 0;
+
+    return {
+      data: filtered.slice(offset, offset + limit),
+      pagination: {
+        limit,
+        offset,
+        total: filtered.length,
+      },
+    };
   },
 
   updateAppointment: async (appointment: Appointment): Promise<Appointment> => {
@@ -234,22 +292,25 @@ describe("AppointmentService", () => {
       const result = await appointmentService.getAllAppointments();
 
       expect(result).toBeDefined();
-      expect(result.length).toBe(4);
+      expect(result.data).toBeDefined();
+      expect(result.pagination).toBeDefined();
+      expect(result.data.length).toBe(4);
+      expect(result.pagination.total).toBe(4);
     });
 
     it("should return appointments with correct data", async () => {
       const result = await appointmentService.getAllAppointments();
 
-      expect(result[0]!.userId).toBe(1);
-      expect(result[1]!.userId).toBe(2);
-      expect(result[2]!.userId).toBe(1);
-      expect(result[3]!.userId).toBe(3);
+      expect(result.data[0]!.userId).toBe(1);
+      expect(result.data[1]!.userId).toBe(2);
+      expect(result.data[2]!.userId).toBe(1);
+      expect(result.data[3]!.userId).toBe(3);
     });
 
     it("should return appointments with all required fields", async () => {
       const result = await appointmentService.getAllAppointments();
 
-      result.forEach((apt) => {
+      result.data.forEach((apt) => {
         expect(apt.id).toBeDefined();
         expect(apt.userId).toBeDefined();
         expect(apt.barberId).toBeDefined();
@@ -264,23 +325,26 @@ describe("AppointmentService", () => {
       const result = await appointmentService.getAppointmentsByUserId(1);
 
       expect(result).toBeDefined();
-      expect(result.length).toBe(2);
-      expect(result.every((apt) => apt.userId === 1)).toBe(true);
+      expect(result.data).toBeDefined();
+      expect(result.pagination).toBeDefined();
+      expect(result.data.length).toBe(2);
+      expect(result.data.every((apt) => apt.userId === 1)).toBe(true);
     });
 
     it("should return empty array for user with no appointments", async () => {
       const result = await appointmentService.getAppointmentsByUserId(999);
 
       expect(result).toBeDefined();
-      expect(result.length).toBe(0);
+      expect(result.data).toBeDefined();
+      expect(result.data.length).toBe(0);
     });
 
     it("should return correct user appointments", async () => {
       const result = await appointmentService.getAppointmentsByUserId(3);
 
-      expect(result.length).toBe(1);
-      expect(result[0]!.userId).toBe(3);
-      expect(result[0]!.id).toBe(4);
+      expect(result.data.length).toBe(1);
+      expect(result.data[0]!.userId).toBe(3);
+      expect(result.data[0]!.id).toBe(4);
     });
   });
 

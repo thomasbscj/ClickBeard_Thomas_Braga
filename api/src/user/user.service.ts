@@ -1,13 +1,13 @@
 import bcrypt from "bcrypt";
 import { User } from "./user.model";
-import { id } from "../types/types";
+import { id, PaginationParams, PaginatedResponse } from "../types/types";
 import { userRepository } from "./user.repository";
 import type { IUserRepository } from "./user.repository";
 
 interface IUserService {
   createUser(user: User): Promise<User>;
   getUserById(id: id): Promise<User>;
-  getAllUsers(): Promise<User[]>;
+  getAllUsers(pagination?: PaginationParams): Promise<PaginatedResponse<User>>;
   updateUser(user: User): Promise<User>;
   deleteUserById(id: id): Promise<void>;
 }
@@ -32,8 +32,10 @@ export class UserService implements IUserService {
     return this.userRepository.getUserById(id);
   }
 
-  async getAllUsers(): Promise<User[]> {
-    return this.userRepository.getAllUsers();
+  async getAllUsers(
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<User>> {
+    return this.userRepository.getAllUsers(pagination);
   }
 
   async updateUser(user: User): Promise<User> {

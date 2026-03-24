@@ -9,7 +9,7 @@ import {
   handleValidationError,
   handleNotFoundError,
 } from "../utils/errorHandler";
-import { parseStringParam } from "../utils/paramParser";
+import { parseStringParam, parsePaginationParams } from "../utils/paramParser";
 import { adminMiddleware } from "../middleware/adminMiddleware";
 
 export const specialtyRouter = Router();
@@ -28,16 +28,19 @@ specialtyRouter.get("/:name", async (req: Request, res: Response) => {
 
 specialtyRouter.get("/", async (req: Request, res: Response) => {
   try {
-    const specialties = await specialtyService.getAllSpecialties();
-    res.status(200).json(specialties);
+    const { limit, offset } = parsePaginationParams(
+      req.query.limit,
+      req.query.offset,
+    );
+    const result = await specialtyService.getAllSpecialties({ limit, offset });
+    res.status(200).json(result);
   } catch (error) {
     console.error("Error fetching specialties:", error);
     res.status(500).json({ error: "Failed to get specialties" });
   }
 });
 
-
-specialtyRouter.use(adminMiddleware)
+specialtyRouter.use(adminMiddleware);
 specialtyRouter.post("/", async (req: Request, res: Response) => {
   try {
     const validatedData = validateSpecialtyCreate(req.body);

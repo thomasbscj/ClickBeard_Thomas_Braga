@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Specialty } from "./specialty.model";
 import type { ISpecialtyRepository } from "./specialty.repository";
+import { PaginatedResponse } from "../types/types";
 import { SpecialtyService } from "./specialty.service";
 
 // Mock hardcoded do repositório de Specialty
@@ -35,29 +36,32 @@ const mockSpecialtyRepository: ISpecialtyRepository = {
     return specialty;
   },
 
-  getAllSpecialties: async (): Promise<Specialty[]> => {
-    return [
-      {
-        name: "Corte de Cabelo",
-        description: "Serviço profissional de corte e estilo de cabelo",
-      },
-      {
-        name: "Barba",
-        description: "Serviço completo de aparação e design de barba",
-      },
-      {
-        name: "Coloração",
-        description: "Serviço de coloração e tingimento de cabelo",
-      },
-      {
-        name: "Design de Sobrancelha",
-        description: "Serviço de design e depilação de sobrancelha",
-      },
-      {
-        name: "Lavagem",
-        description: "Serviço de higienização e lavagem de cabelo",
-      },
-    ];
+  getAllSpecialties: async (): Promise<PaginatedResponse<Specialty>> => {
+    return {
+      data: [
+        {
+          name: "Corte de Cabelo",
+          description: "Serviço profissional de corte e estilo de cabelo",
+        },
+        {
+          name: "Barba",
+          description: "Serviço completo de aparação e design de barba",
+        },
+        {
+          name: "Coloração",
+          description: "Serviço de coloração e tingimento de cabelo",
+        },
+        {
+          name: "Design de Sobrancelha",
+          description: "Serviço de design e depilação de sobrancelha",
+        },
+        {
+          name: "Lavagem",
+          description: "Serviço de higienização e lavagem de cabelo",
+        },
+      ],
+      pagination: { limit: 10, offset: 0, total: 5 },
+    };
   },
 
   updateSpecialty: async (specialty: Specialty): Promise<Specialty> => {
@@ -153,23 +157,24 @@ describe("SpecialtyService", () => {
       const result = await specialtyService.getAllSpecialties();
 
       expect(result).toBeDefined();
-      expect(result.length).toBe(5);
+      expect(result.data.length).toBe(5);
+      expect(result.pagination.total).toBe(5);
     });
 
     it("should return specialties with correct data", async () => {
       const result = await specialtyService.getAllSpecialties();
 
-      expect(result[0]!.name).toBe("Corte de Cabelo");
-      expect(result[1]!.name).toBe("Barba");
-      expect(result[2]!.name).toBe("Coloração");
-      expect(result[3]!.name).toBe("Design de Sobrancelha");
-      expect(result[4]!.name).toBe("Lavagem");
+      expect(result.data[0]!.name).toBe("Corte de Cabelo");
+      expect(result.data[1]!.name).toBe("Barba");
+      expect(result.data[2]!.name).toBe("Coloração");
+      expect(result.data[3]!.name).toBe("Design de Sobrancelha");
+      expect(result.data[4]!.name).toBe("Lavagem");
     });
 
     it("should return specialties with all required fields", async () => {
       const result = await specialtyService.getAllSpecialties();
 
-      result.forEach((specialty) => {
+      result.data.forEach((specialty) => {
         expect(specialty.name).toBeDefined();
         expect(specialty.description).toBeDefined();
         expect(typeof specialty.name).toBe("string");
@@ -180,7 +185,7 @@ describe("SpecialtyService", () => {
     it("should return at least one specialty", async () => {
       const result = await specialtyService.getAllSpecialties();
 
-      expect(result.length).toBeGreaterThan(0);
+      expect(result.data.length).toBeGreaterThan(0);
     });
   });
 

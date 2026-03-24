@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Barber, BarberCreateInput } from "./barber.model";
 import type { IBarberRepository } from "./barber.repository";
+import { PaginatedResponse } from "../types/types";
 import { BarberService } from "./barber.service";
 
 // Mock hardcoded do repositório de Barber
@@ -28,30 +29,33 @@ const mockBarberRepository: IBarberRepository = {
     throw new Error("Barber not found");
   },
 
-  getAllBarbers: async (): Promise<Barber[]> => {
-    return [
-      {
-        id: 1,
-        name: "João Silva",
-        specialtyId: "corte-cabelo",
-        bornAt: 1990,
-        hiredAt: new Date("2020-01-15"),
-      },
-      {
-        id: 2,
-        name: "Pedro Santos",
-        specialtyId: "barba",
-        bornAt: 1985,
-        hiredAt: new Date("2019-06-20"),
-      },
-      {
-        id: 3,
-        name: "Carlos Costa",
-        specialtyId: "coloracao",
-        bornAt: 1992,
-        hiredAt: new Date("2021-03-10"),
-      },
-    ];
+  getAllBarbers: async (): Promise<PaginatedResponse<Barber>> => {
+    return {
+      data: [
+        {
+          id: 1,
+          name: "João Silva",
+          specialtyId: "corte-cabelo",
+          bornAt: 1990,
+          hiredAt: new Date("2020-01-15"),
+        },
+        {
+          id: 2,
+          name: "Pedro Santos",
+          specialtyId: "barba",
+          bornAt: 1985,
+          hiredAt: new Date("2019-06-20"),
+        },
+        {
+          id: 3,
+          name: "Carlos Costa",
+          specialtyId: "coloracao",
+          bornAt: 1992,
+          hiredAt: new Date("2021-03-10"),
+        },
+      ],
+      pagination: { limit: 10, offset: 0, total: 3 },
+    };
   },
 
   updateBarber: async (barber: Barber): Promise<Barber> => {
@@ -126,7 +130,7 @@ describe("BarberService", () => {
 
     it("should throw error when barber not found", async () => {
       await expect(barberService.getBarberById(999)).rejects.toThrow(
-        "Barber not found"
+        "Barber not found",
       );
     });
 
@@ -143,21 +147,22 @@ describe("BarberService", () => {
       const result = await barberService.getAllBarbers();
 
       expect(result).toBeDefined();
-      expect(result.length).toBe(3);
+      expect(result.data.length).toBe(3);
+      expect(result.pagination.total).toBe(3);
     });
 
     it("should return barbers with correct data", async () => {
       const result = await barberService.getAllBarbers();
 
-      expect(result[0]!.name).toBe("João Silva");
-      expect(result[1]!.name).toBe("Pedro Santos");
-      expect(result[2]!.name).toBe("Carlos Costa");
+      expect(result.data[0]!.name).toBe("João Silva");
+      expect(result.data[1]!.name).toBe("Pedro Santos");
+      expect(result.data[2]!.name).toBe("Carlos Costa");
     });
 
     it("should return barbers with all required fields", async () => {
       const result = await barberService.getAllBarbers();
 
-      result.forEach((barber : Barber) => {
+      result.data.forEach((barber: Barber) => {
         expect(barber.id).toBeDefined();
         expect(barber.name).toBeDefined();
         expect(barber.specialtyId).toBeDefined();
@@ -217,13 +222,13 @@ describe("BarberService", () => {
 
     it("should throw error for invalid barber ID", async () => {
       await expect(barberService.deleteBarberById(-1)).rejects.toThrow(
-        "Invalid barber ID"
+        "Invalid barber ID",
       );
     });
 
     it("should throw error for zero ID", async () => {
       await expect(barberService.deleteBarberById(0)).rejects.toThrow(
-        "Invalid barber ID"
+        "Invalid barber ID",
       );
     });
   });

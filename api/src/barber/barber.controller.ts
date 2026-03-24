@@ -9,11 +9,10 @@ import {
   handleValidationError,
   handleNotFoundError,
 } from "../utils/errorHandler";
-import { parseIntParam } from "../utils/paramParser";
+import { parseIntParam, parsePaginationParams } from "../utils/paramParser";
 import { adminMiddleware } from "../middleware/adminMiddleware";
 
 export const barberRouter = Router();
-
 
 // Get Barber by ID
 barberRouter.get("/:id", async (req: Request, res: Response) => {
@@ -31,15 +30,19 @@ barberRouter.get("/:id", async (req: Request, res: Response) => {
 // Get All Barbers
 barberRouter.get("/", async (req: Request, res: Response) => {
   try {
-    const barbers = await barberService.getAllBarbers();
-    res.status(200).json(barbers);
+    const { limit, offset } = parsePaginationParams(
+      req.query.limit,
+      req.query.offset,
+    );
+    const result = await barberService.getAllBarbers({ limit, offset });
+    res.status(200).json(result);
   } catch (error) {
     console.error("Error fetching barbers:", error);
     res.status(500).json({ error: "Failed to get barbers" });
   }
 });
 
-barberRouter.use(adminMiddleware)
+barberRouter.use(adminMiddleware);
 barberRouter.post("/", async (req: Request, res: Response) => {
   try {
     const validatedData = validateBarberCreate(req.body);
@@ -56,7 +59,6 @@ barberRouter.post("/", async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to create barber" });
   }
 });
-
 
 // Update Barber
 barberRouter.put("/:id", async (req: Request, res: Response) => {

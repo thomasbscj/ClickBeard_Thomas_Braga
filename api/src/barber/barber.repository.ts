@@ -1,10 +1,13 @@
 import { Barber, BarberCreateInput } from "./barber.model";
 import { db } from "../repository/repository";
+import { PaginationParams, PaginatedResponse } from "../types/types";
 
 export interface IBarberRepository {
   createBarber(barber: BarberCreateInput): Promise<Barber>;
   getBarberById(id: number): Promise<Barber>;
-  getAllBarbers(): Promise<Barber[]>;
+  getAllBarbers(
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<Barber>>;
   updateBarber(barber: Barber): Promise<Barber>;
   deleteBarberById(id: number): Promise<any>;
 }
@@ -43,16 +46,34 @@ class BarberRepository implements IBarberRepository {
     };
   }
 
-  async getAllBarbers(): Promise<Barber[]> {
-    const barbers = await db.barber.findMany();
+  async getAllBarbers(
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<Barber>> {
+    const limit = pagination?.limit || 10;
+    const offset = pagination?.offset || 0;
 
-    return barbers.map((barber) => ({
-      id: barber.id,
-      name: barber.name,
-      specialtyId: barber.specialtyId,
-      bornAt: barber.bornAt,
-      hiredAt: barber.hiredAt,
-    }));
+    const [barbers, total] = await Promise.all([
+      db.barber.findMany({
+        skip: offset,
+        take: limit,
+      }),
+      db.barber.count(),
+    ]);
+
+    return {
+      data: barbers.map((barber) => ({
+        id: barber.id,
+        name: barber.name,
+        specialtyId: barber.specialtyId,
+        bornAt: barber.bornAt,
+        hiredAt: barber.hiredAt,
+      })),
+      pagination: {
+        limit,
+        offset,
+        total,
+      },
+    };
   }
 
   async updateBarber(barber: Barber): Promise<Barber> {

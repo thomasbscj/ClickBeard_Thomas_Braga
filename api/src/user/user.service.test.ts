@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { User, UserRole } from "./user.model";
 import type { IUserRepository } from "./user.repository";
+import { PaginatedResponse } from "../types/types";
 import { UserService } from "./user.service";
 
 // Mock hardcoded do repositório de User
@@ -37,30 +38,36 @@ const mockUserRepository: IUserRepository = {
     throw new Error("User not found");
   },
 
-  getAllUsers: async (): Promise<User[]> => {
-    return [
-      {
-        Id: 1,
-        Name: "João Silva",
-        email: "joao@example.com",
-        Password: "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86AGR0Ifuu",
-        Role: UserRole.USER,
-      },
-      {
-        Id: 2,
-        Name: "Admin User",
-        email: "admin@example.com",
-        Password: "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86AGR0Ifuu",
-        Role: UserRole.ADMIN,
-      },
-      {
-        Id: 3,
-        Name: "Maria Santos",
-        email: "maria@example.com",
-        Password: "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86AGR0Ifuu",
-        Role: UserRole.USER,
-      },
-    ];
+  getAllUsers: async (): Promise<PaginatedResponse<User>> => {
+    return {
+      data: [
+        {
+          Id: 1,
+          Name: "João Silva",
+          email: "joao@example.com",
+          Password:
+            "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86AGR0Ifuu",
+          Role: UserRole.USER,
+        },
+        {
+          Id: 2,
+          Name: "Admin User",
+          email: "admin@example.com",
+          Password:
+            "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86AGR0Ifuu",
+          Role: UserRole.ADMIN,
+        },
+        {
+          Id: 3,
+          Name: "Maria Santos",
+          email: "maria@example.com",
+          Password:
+            "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86AGR0Ifuu",
+          Role: UserRole.USER,
+        },
+      ],
+      pagination: { limit: 10, offset: 0, total: 3 },
+    };
   },
 
   updateUser: async (user: User): Promise<User> => {
@@ -199,21 +206,22 @@ describe("UserService", () => {
       const result = await userService.getAllUsers();
 
       expect(result).toBeDefined();
-      expect(result.length).toBe(3);
+      expect(result.data.length).toBe(3);
+      expect(result.pagination.total).toBe(3);
     });
 
     it("should return users with correct data", async () => {
       const result = await userService.getAllUsers();
 
-      expect(result[0]!.Name).toBe("João Silva");
-      expect(result[1]!.Name).toBe("Admin User");
-      expect(result[2]!.Name).toBe("Maria Santos");
+      expect(result.data[0]!.Name).toBe("João Silva");
+      expect(result.data[1]!.Name).toBe("Admin User");
+      expect(result.data[2]!.Name).toBe("Maria Santos");
     });
 
     it("should return users with all required fields", async () => {
       const result = await userService.getAllUsers();
 
-      result.forEach((user) => {
+      result.data.forEach((user) => {
         expect(user.Id).toBeDefined();
         expect(user.Name).toBeDefined();
         expect(user.email).toBeDefined();
@@ -225,8 +233,8 @@ describe("UserService", () => {
     it("should include both user and admin roles", async () => {
       const result = await userService.getAllUsers();
 
-      const hasUser = result.some((u) => u.Role === UserRole.USER);
-      const hasAdmin = result.some((u) => u.Role === UserRole.ADMIN);
+      const hasUser = result.data.some((u) => u.Role === UserRole.USER);
+      const hasAdmin = result.data.some((u) => u.Role === UserRole.ADMIN);
 
       expect(hasUser).toBe(true);
       expect(hasAdmin).toBe(true);
@@ -235,7 +243,7 @@ describe("UserService", () => {
     it("should return at least one user", async () => {
       const result = await userService.getAllUsers();
 
-      expect(result.length).toBeGreaterThan(0);
+      expect(result.data.length).toBeGreaterThan(0);
     });
   });
 

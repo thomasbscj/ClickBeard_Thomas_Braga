@@ -9,7 +9,7 @@ import {
   handleValidationError,
   handleNotFoundError,
 } from "../utils/errorHandler";
-import { parseIntParam } from "../utils/paramParser";
+import { parseIntParam, parsePaginationParams } from "../utils/paramParser";
 import { adminMiddleware } from "../middleware/adminMiddleware";
 
 export const appointmentRouter = Router();
@@ -79,9 +79,15 @@ appointmentRouter.get(
         return;
       }
 
-      const appointments =
-        await appointmentService.getAppointmentsByUserId(userId);
-      res.status(200).json(appointments);
+      const { limit, offset } = parsePaginationParams(
+        req.query.limit,
+        req.query.offset,
+      );
+      const result = await appointmentService.getAppointmentsByUserId(userId, {
+        limit,
+        offset,
+      });
+      res.status(200).json(result);
     } catch (error) {
       console.error("Error fetching user appointments:", error);
       res.status(500).json({ error: "Failed to get appointments" });
@@ -89,8 +95,7 @@ appointmentRouter.get(
   },
 );
 
-
-appointmentRouter.use(adminMiddleware)
+appointmentRouter.use(adminMiddleware);
 // Get Appointment by ID
 appointmentRouter.get("/:id", async (req: Request, res: Response) => {
   try {
@@ -107,14 +112,20 @@ appointmentRouter.get("/:id", async (req: Request, res: Response) => {
 // Get All Appointments
 appointmentRouter.get("/", async (req: Request, res: Response) => {
   try {
-    const appointments = await appointmentService.getAllAppointments();
-    res.status(200).json(appointments);
+    const { limit, offset } = parsePaginationParams(
+      req.query.limit,
+      req.query.offset,
+    );
+    const result = await appointmentService.getAllAppointments({
+      limit,
+      offset,
+    });
+    res.status(200).json(result);
   } catch (error) {
     console.error("Error fetching appointments:", error);
     res.status(500).json({ error: "Failed to get appointments" });
   }
 });
-
 
 // Delete Appointment
 appointmentRouter.delete("/:id", async (req: Request, res: Response) => {

@@ -61,8 +61,8 @@ export class AuthService {
 
   async register(user: User): Promise<AuthResponse> {
     // Check if user already exists
-    const users = await this.repository.getAllUsers();
-    const userExists = users.some((u) => u.email === user.email);
+    const usersResponse = await this.repository.getAllUsers();
+    const userExists = usersResponse.data.some((u) => u.email === user.email);
 
     if (userExists) {
       throw new Error("User with this email already exists");
@@ -101,8 +101,8 @@ export class AuthService {
 
   async login(email: string, password: string): Promise<AuthResponse> {
     // Find user by email
-    const users = await this.repository.getAllUsers();
-    const user = users.find((u) => u.email === email);
+    const usersResponse = await this.repository.getAllUsers();
+    const user = usersResponse.data.find((u) => u.email === email);
 
     if (!user) {
       throw new Error("Invalid email or password");

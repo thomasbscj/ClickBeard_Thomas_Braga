@@ -1,12 +1,18 @@
 import { Appointment } from "./appointment.model";
 import { appointmentRepository } from "./appointment.repository";
 import type { IAppointmentRepository } from "./appointment.repository";
+import { PaginationParams, PaginatedResponse } from "../types/types";
 
 interface IAppointmentService {
   createAppointment(appointment: Appointment): Promise<Appointment>;
   getAppointmentById(id: number): Promise<Appointment>;
-  getAllAppointments(): Promise<Appointment[]>;
-  getAppointmentsByUserId(userId: number): Promise<Appointment[]>;
+  getAllAppointments(
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<Appointment>>;
+  getAppointmentsByUserId(
+    userId: number,
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<Appointment>>;
   updateAppointment(appointment: Appointment): Promise<Appointment>;
   deleteAppointmentById(id: number): Promise<void>;
   cancelAppointment(
@@ -51,7 +57,7 @@ export class AppointmentService implements IAppointmentService {
     const allAppointments =
       await this.appointmentRepository.getAllAppointments();
 
-    const conflictingAppointments = allAppointments.filter(
+    const conflictingAppointments = allAppointments.data.filter(
       (apt) =>
         apt.barberId === barberId &&
         new Date(apt.datetime).getTime() < endTime.getTime() &&
@@ -78,7 +84,7 @@ export class AppointmentService implements IAppointmentService {
     const allAppointments =
       await this.appointmentRepository.getAllAppointments();
 
-    const conflictingAppointments = allAppointments.filter(
+    const conflictingAppointments = allAppointments.data.filter(
       (apt) =>
         (!excludeAppointmentId || apt.id !== excludeAppointmentId) &&
         apt.barberId === barberId &&
@@ -114,12 +120,20 @@ export class AppointmentService implements IAppointmentService {
     return this.appointmentRepository.getAppointmentById(id);
   }
 
-  async getAllAppointments(): Promise<Appointment[]> {
-    return this.appointmentRepository.getAllAppointments();
+  async getAllAppointments(
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<Appointment>> {
+    return this.appointmentRepository.getAllAppointments(pagination);
   }
 
-  async getAppointmentsByUserId(userId: number): Promise<Appointment[]> {
-    return this.appointmentRepository.getAppointmentsByUserId(userId);
+  async getAppointmentsByUserId(
+    userId: number,
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<Appointment>> {
+    return this.appointmentRepository.getAppointmentsByUserId(
+      userId,
+      pagination,
+    );
   }
 
   async updateAppointment(appointment: Appointment): Promise<Appointment> {

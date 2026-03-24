@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { User, UserRole } from "../user/user.model";
 import type { IUserRepository } from "../user/user.repository";
+import { PaginatedResponse } from "../types/types";
 import { AuthService } from "./auth.service";
 
 // Mock hardcoded do repositório de User para Auth
@@ -28,23 +29,28 @@ const mockUserRepository: IUserRepository = {
     throw new Error("User not found");
   },
 
-  getAllUsers: async (): Promise<User[]> => {
-    return [
-      {
-        Id: 1,
-        Name: "João Silva",
-        email: "joao@example.com",
-        Password: "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86AGR0Ifuu",
-        Role: UserRole.USER,
-      },
-      {
-        Id: 2,
-        Name: "Admin User",
-        email: "admin@example.com",
-        Password: "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86AGR0Ifuu",
-        Role: UserRole.ADMIN,
-      },
-    ];
+  getAllUsers: async (): Promise<PaginatedResponse<User>> => {
+    return {
+      data: [
+        {
+          Id: 1,
+          Name: "João Silva",
+          email: "joao@example.com",
+          Password:
+            "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86AGR0Ifuu",
+          Role: UserRole.USER,
+        },
+        {
+          Id: 2,
+          Name: "Admin User",
+          email: "admin@example.com",
+          Password:
+            "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86AGR0Ifuu",
+          Role: UserRole.ADMIN,
+        },
+      ],
+      pagination: { limit: 10, offset: 0, total: 2 },
+    };
   },
 
   updateUser: async (user: User): Promise<User> => {
