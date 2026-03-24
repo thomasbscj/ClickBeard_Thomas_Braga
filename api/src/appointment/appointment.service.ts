@@ -6,6 +6,7 @@ interface IAppointmentService {
   createAppointment(appointment: Appointment): Promise<Appointment>;
   getAppointmentById(id: number): Promise<Appointment>;
   getAllAppointments(): Promise<Appointment[]>;
+  getAppointmentsByUserId(userId: number): Promise<Appointment[]>;
   updateAppointment(appointment: Appointment): Promise<Appointment>;
   deleteAppointmentById(id: number): Promise<void>;
   cancelAppointment(
@@ -18,6 +19,7 @@ class AppointmentService implements IAppointmentService {
   private readonly OPENING_HOUR = 8;
   private readonly CLOSING_HOUR = 18;
   private readonly APPOINTMENT_DURATION = 30;
+  private readonly CANCELLATION_NOTICE_HOURS = 2;
 
   constructor(private appointmentRepository: IAppointmentRepository) {}
 
@@ -113,6 +115,10 @@ class AppointmentService implements IAppointmentService {
     return this.appointmentRepository.getAllAppointments();
   }
 
+  async getAppointmentsByUserId(userId: number): Promise<Appointment[]> {
+    return this.appointmentRepository.getAppointmentsByUserId(userId);
+  }
+
   async updateAppointment(appointment: Appointment): Promise<Appointment> {
     let appointmentDateTime = new Date(appointment.datetime);
 
@@ -144,6 +150,17 @@ class AppointmentService implements IAppointmentService {
 
     if (appointment.userId !== userId) {
       throw new Error("You can only cancel your own appointments");
+    }
+
+    const now = new Date();
+    const appointmentTime = new Date(appointment.datetime);
+    const hoursUntilAppointment =
+      (appointmentTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+    if (hoursUntilAppointment < this.CANCELLATION_NOTICE_HOURS) {
+      throw new Error(
+        `Appointments must be cancelled at least ${this.CANCELLATION_NOTICE_HOURS} hours in advance`,
+      );
     }
 
     return this.appointmentRepository.updateAppointment({

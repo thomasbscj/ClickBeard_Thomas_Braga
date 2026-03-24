@@ -54,6 +54,28 @@ appointmentRouter.get("/", async (req: Request, res: Response) => {
   }
 });
 
+// Get My Appointments
+appointmentRouter.get(
+  "/my-appointments",
+  async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+
+      if (!userId) {
+        res.status(401).json({ error: "Unauthorized" });
+        return;
+      }
+
+      const appointments =
+        await appointmentService.getAppointmentsByUserId(userId);
+      res.status(200).json(appointments);
+    } catch (error) {
+      console.error("Error fetching user appointments:", error);
+      res.status(500).json({ error: "Failed to get appointments" });
+    }
+  },
+);
+
 // Update Appointment
 appointmentRouter.put("/:id", async (req: Request, res: Response) => {
   try {
@@ -105,6 +127,13 @@ appointmentRouter.post("/:id/cancel", async (req: Request, res: Response) => {
       error.message === "You can only cancel your own appointments"
     ) {
       res.status(403).json({ error: error.message });
+      return;
+    }
+    if (
+      error instanceof Error &&
+      error.message.includes("Appointments must be cancelled at least")
+    ) {
+      res.status(400).json({ error: error.message });
       return;
     }
     if (error instanceof Error && error.message === "Appointment not found") {

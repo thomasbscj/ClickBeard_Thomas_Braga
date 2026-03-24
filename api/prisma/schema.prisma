@@ -30,6 +30,7 @@ model User {
   name         String
   Role  Role
   appointments Appointment[]
+  refreshTokenSessions RefreshTokenSession[]
 }
 
 model Barber {
@@ -50,4 +51,17 @@ model Appointment {
   barberId Int
   active Boolean
   datetime DateTime
+}
+
+model RefreshTokenSession {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  revokedAt DateTime?
+
+  @@index([userId])
+  @@index([expiresAt])
 }

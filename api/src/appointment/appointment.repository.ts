@@ -5,6 +5,7 @@ export interface IAppointmentRepository {
   createAppointment(appointment: Appointment): Promise<Appointment>;
   getAppointmentById(id: number): Promise<Appointment>;
   getAllAppointments(): Promise<Appointment[]>;
+  getAppointmentsByUserId(userId: number): Promise<Appointment[]>;
   updateAppointment(appointment: Appointment): Promise<Appointment>;
   deleteAppointmentById(id: number): Promise<any>;
 }
@@ -45,6 +46,22 @@ class AppointmentRepository implements IAppointmentRepository {
 
   async getAllAppointments(): Promise<Appointment[]> {
     const appointments = await db.appointment.findMany();
+
+    return appointments.map((appointment) => ({
+      id: appointment.id,
+      userId: appointment.userId,
+      barberId: appointment.barberId,
+      datetime: appointment.datetime,
+      active: appointment.active,
+    }));
+  }
+
+  async getAppointmentsByUserId(userId: number): Promise<Appointment[]> {
+    const appointments = await db.appointment.findMany({
+      where: {
+        userId: userId,
+      },
+    });
 
     return appointments.map((appointment) => ({
       id: appointment.id,
