@@ -21,13 +21,21 @@ interface RefreshResponse {
   refreshToken: string;
 }
 
-class AuthService {
+export class AuthService {
   private readonly JWT_SECRET: string =
     process.env.JWT_SECRET || "your-secret-key";
   private readonly JWT_EXPIRY: string = process.env.JWT_EXPIRY || "1h";
   private readonly REFRESH_TOKEN_EXPIRY: number = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
 
-  constructor(private repository: typeof userRepository) {}
+  constructor(
+    private repository: typeof userRepository,
+    private tokenRepository?: typeof refreshTokenRepository,
+  ) {
+    // If not provided, use the default
+    if (!this.tokenRepository) {
+      this.tokenRepository = refreshTokenRepository;
+    }
+  }
 
   private generateToken(payload: JWTPayload): string {
     return jwt.sign(payload, this.JWT_SECRET, {
@@ -78,7 +86,7 @@ class AuthService {
     const refreshToken = this.generateRefreshToken();
     const expiresAt = new Date(Date.now() + this.REFRESH_TOKEN_EXPIRY);
 
-    await refreshTokenRepository.createSession(
+    await this.tokenRepository!.createSession(
       newUser.Id as number,
       refreshToken,
       expiresAt,
@@ -119,7 +127,7 @@ class AuthService {
     const refreshToken = this.generateRefreshToken();
     const expiresAt = new Date(Date.now() + this.REFRESH_TOKEN_EXPIRY);
 
-    await refreshTokenRepository.createSession(
+    await this.tokenRepository!.createSession(
       user.Id as number,
       refreshToken,
       expiresAt,
@@ -134,13 +142,13 @@ class AuthService {
 
   async refreshAccessToken(refreshToken: string): Promise<RefreshResponse> {
     // Validate refresh token exists and is not revoked
-    const isValid = await refreshTokenRepository.isSessionValid(refreshToken);
+    const isValid = await this.tokenRepository!.isSessionValid(refreshToken);
 
     if (!isValid) {
       throw new Error("Invalid or expired refresh token");
     }
 
-    const session = await refreshTokenRepository.getSession(refreshToken);
+    const session = await this.tokenRepository!.getSession(refreshToken);
 
     if (!session) {
       throw new Error("Refresh token not found");
@@ -157,10 +165,10 @@ class AuthService {
     const expiresAt = new Date(Date.now() + this.REFRESH_TOKEN_EXPIRY);
 
     // Revoke old refresh token
-    await refreshTokenRepository.revokeSession(refreshToken);
+    await this.tokenRepository!.revokeSession(refreshToken);
 
     // Create new refresh token session
-    await refreshTokenRepository.createSession(
+    await this.tokenRepository!.createSession(
       session.userId,
       newRefreshToken,
       expiresAt,
@@ -174,12 +182,12 @@ class AuthService {
 
   async logout(refreshToken: string): Promise<void> {
     // Revoke the refresh token
-    await refreshTokenRepository.revokeSession(refreshToken);
+    await this.tokenRepository!.revokeSession(refreshToken);
   }
 
   async logoutAll(userId: number): Promise<void> {
     // Revoke all refresh tokens for this user
-    await refreshTokenRepository.revokeAllUserSessions(userId);
+    await this.tokenRepository!.revokeAllUserSessions(userId);
   }
 
   verifyToken(token: string): JWTPayload {

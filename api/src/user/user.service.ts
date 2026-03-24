@@ -12,7 +12,7 @@ interface IUserService {
   deleteUserById(id: id): Promise<void>;
 }
 
-class UserService implements IUserService {
+export class UserService implements IUserService {
   constructor(private userRepository: IUserRepository) {}
 
   private async hashPassword(password: string): Promise<string> {

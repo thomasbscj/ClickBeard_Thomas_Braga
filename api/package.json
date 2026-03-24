@@ -1,7 +1,11 @@
 {
+  "type": "commonjs",
   "scripts": {
     "build": "npx tsc",
-    "run": "node ./dist/main.js"
+    "start": "node --env-file=.env ./dist/main.js",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.5.0",
@@ -20,6 +24,8 @@
   "devDependencies": {
     "@types/node": "^25.5.0",
     "@types/pg": "^8.20.0",
-    "prisma": "^7.5.0"
+    "@vitest/ui": "^1.2.0",
+    "prisma": "^7.5.0",
+    "vitest": "^1.6.1"
   }
 }

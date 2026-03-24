@@ -10,7 +10,7 @@ interface IBarberService {
   deleteBarberById(id: number): Promise<void>;
 }
 
-class BarberService implements IBarberService {
+export class BarberService implements IBarberService {
   constructor(private barberRepository: IBarberRepository) {}
 
   async createBarber(barber: BarberCreateInput): Promise<Barber> {

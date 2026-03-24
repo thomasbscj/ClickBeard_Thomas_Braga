@@ -15,13 +15,16 @@ interface IAppointmentService {
   ): Promise<Appointment>;
 }
 
-class AppointmentService implements IAppointmentService {
+export class AppointmentService implements IAppointmentService {
   private readonly OPENING_HOUR = 8;
   private readonly CLOSING_HOUR = 18;
   private readonly APPOINTMENT_DURATION = 30;
   private readonly CANCELLATION_NOTICE_HOURS = 2;
 
-  constructor(private appointmentRepository: IAppointmentRepository) {}
+  constructor(
+    private appointmentRepository: IAppointmentRepository,
+    private getCurrentDate: () => Date = () => new Date(),
+  ) {}
 
   private roundToNearestHalfHour(datetime: Date): Date {
     const minutes = datetime.getMinutes();
@@ -152,8 +155,8 @@ class AppointmentService implements IAppointmentService {
       throw new Error("You can only cancel your own appointments");
     }
 
-    const now = new Date();
-    const appointmentTime = new Date(appointment.datetime);
+    const now = this.getCurrentDate();
+    const appointmentTime = appointment.datetime;
     const hoursUntilAppointment =
       (appointmentTime.getTime() - now.getTime()) / (1000 * 60 * 60);
 

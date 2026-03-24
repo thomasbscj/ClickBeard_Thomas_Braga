@@ -10,7 +10,7 @@ interface ISpecialtyService {
   deleteSpecialtyByName(name: string): Promise<void>;
 }
 
-class SpecialtyService implements ISpecialtyService {
+export class SpecialtyService implements ISpecialtyService {
   constructor(private specialtyRepository: ISpecialtyRepository) {}
 
   async createSpecialty(specialty: Specialty): Promise<Specialty> {
