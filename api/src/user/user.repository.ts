@@ -18,7 +18,7 @@ class UserRepository implements IUserRepository {
         name: user.Name,
         email: user.email,
         credential: user.Password,
-        Role: user.Role,
+        role: user.Role,
       },
     });
   }
@@ -38,7 +38,7 @@ class UserRepository implements IUserRepository {
       Name: user.name,
       email: user.email,
       Password: user.credential,
-      Role: user.Role as any,
+      Role: user.role as any,
     };
   }
   async getAllUsers(
@@ -61,7 +61,7 @@ class UserRepository implements IUserRepository {
         Name: user.name,
         email: user.email,
         Password: user.credential,
-        Role: user.Role as any,
+        Role: user.role as any,
       })),
       pagination: {
         limit,
@@ -79,7 +79,7 @@ class UserRepository implements IUserRepository {
         name: user.Name,
         email: user.email,
         credential: user.Password,
-        Role: user.Role,
+        role: user.Role,
       },
     });
 
@@ -88,7 +88,7 @@ class UserRepository implements IUserRepository {
       Name: updatedUser.name,
       email: updatedUser.email,
       Password: updatedUser.credential,
-      Role: updatedUser.Role as any,
+      Role: updatedUser.role as any,
     };
   }
   async deleteUserById(id: id): Promise<any> {

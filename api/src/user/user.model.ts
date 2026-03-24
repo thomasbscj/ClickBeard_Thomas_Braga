@@ -16,7 +16,7 @@ export type User = {
 // DTOs
 export const userCreateDto = z.object({
   Name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email"),
+  email: z.email("Invalid email"),
   Password: z.string().min(6, "Password must be at least 6 characters"),
   Role: z.nativeEnum(UserRole).default(UserRole.USER),
 });
@@ -24,7 +24,7 @@ export const userCreateDto = z.object({
 export const userUpdateDto = z.object({
   Id: z.number().int("Id must be an integer"),
   Name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email"),
+  email: z.email("Invalid email"),
   Password: z.string().min(6, "Password must be at least 6 characters"),
   Role: z.nativeEnum(UserRole).optional(),
 });

@@ -80,7 +80,7 @@ export class AuthService {
     // Generate tokens
     const token = this.generateToken({
       id: newUser.Id as number,
-      role: newUser.Role,
+      role: newUser.role,
     });
 
     const refreshToken = this.generateRefreshToken();
@@ -157,7 +157,7 @@ export class AuthService {
     // Generate new access token
     const token = this.generateToken({
       id: session.user.id,
-      role: session.user.Role as UserRole,
+      role: session.user.role as UserRole,
     });
 
     // Optionally rotate refresh token

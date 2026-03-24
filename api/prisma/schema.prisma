@@ -28,7 +28,7 @@ model User {
   email        String        @unique
   credential   String
   name         String
-  Role  Role
+  role  Role
   appointments Appointment[]
   refreshTokenSessions RefreshTokenSession[]
 }
