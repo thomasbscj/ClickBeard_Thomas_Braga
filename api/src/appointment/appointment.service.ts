@@ -11,9 +11,9 @@ interface IAppointmentService {
 }
 
 class AppointmentService implements IAppointmentService {
-  private readonly OPENING_HOUR = 8; // 8:00 AM
-  private readonly CLOSING_HOUR = 18; // 6:00 PM
-  private readonly APPOINTMENT_DURATION = 30; // 30 minutes
+  private readonly OPENING_HOUR = 8;
+  private readonly CLOSING_HOUR = 18;
+  private readonly APPOINTMENT_DURATION = 30;
 
   constructor(private appointmentRepository: IAppointmentRepository) {}
 

@@ -18,6 +18,7 @@ class UserRepository implements IUserRepository {
         name: user.Name,
         email: user.email,
         credential: user.Password,
+        Role: user.Role,
       },
     });
   }
@@ -37,6 +38,7 @@ class UserRepository implements IUserRepository {
       Name: user.name,
       email: user.email,
       Password: user.credential,
+      Role: user.Role as any,
     };
   }
   async getAllUsers(): Promise<User[]> {
@@ -47,6 +49,7 @@ class UserRepository implements IUserRepository {
       Name: user.name,
       email: user.email,
       Password: user.credential,
+      Role: user.Role as any,
     }));
   }
   async updateUser(user: User): Promise<User> {
@@ -58,6 +61,7 @@ class UserRepository implements IUserRepository {
         name: user.Name,
         email: user.email,
         credential: user.Password,
+        Role: user.Role,
       },
     });
 
@@ -66,6 +70,7 @@ class UserRepository implements IUserRepository {
       Name: updatedUser.name,
       email: updatedUser.email,
       Password: updatedUser.credential,
+      Role: updatedUser.Role as any,
     };
   }
   async deleteUserById(id: id): Promise<any> {

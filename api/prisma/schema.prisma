@@ -12,6 +12,11 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  admin
+  user
+}
+
 model Specialty {
   name        String   @id @unique
   description String
@@ -23,6 +28,7 @@ model User {
   email        String        @unique
   credential   String
   name         String
+  Role  Role
   appointments Appointment[]
 }
 
