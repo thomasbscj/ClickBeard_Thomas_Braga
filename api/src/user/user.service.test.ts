@@ -114,7 +114,7 @@ describe("UserService", () => {
       expect(result.Role).toBe(UserRole.USER);
     });
 
-    it("should hash password before storing", async () => {
+    it("should not return password in response", async () => {
       const userInput: User = {
         Id: 0,
         Name: "Ana Costa",
@@ -125,9 +125,8 @@ describe("UserService", () => {
 
       const result = await userService.createUser(userInput);
 
-      expect(result.Password).toBeDefined();
-      expect(result.Password).not.toBe("myPassword123");
-      expect(result.Password.length).toBeGreaterThan(20);
+      expect(result).not.toHaveProperty("Password");
+      expect((result as any).Password).toBeUndefined();
     });
 
     it("should preserve user information except password", async () => {
@@ -144,6 +143,7 @@ describe("UserService", () => {
       expect(result.Name).toBe(userInput.Name);
       expect(result.email).toBe(userInput.email);
       expect(result.Role).toBe(userInput.Role);
+      expect(result).not.toHaveProperty("Password");
     });
 
     it("should create user with default role if not specified", async () => {
@@ -158,6 +158,7 @@ describe("UserService", () => {
       const result = await userService.createUser(userInput);
 
       expect(result.Role).toBe(UserRole.USER);
+      expect(result).not.toHaveProperty("Password");
     });
   });
 
@@ -183,12 +184,13 @@ describe("UserService", () => {
       );
     });
 
-    it("should return correct user details", async () => {
+    it("should not return password in response", async () => {
       const result = await userService.getUserById(1);
 
       expect(result.Name).toBe("João Silva");
       expect(result.email).toBe("joao@example.com");
-      expect(result.Password).toBeDefined();
+      expect(result).not.toHaveProperty("Password");
+      expect((result as any).Password).toBeUndefined();
     });
 
     it("should distinguish between user roles", async () => {
@@ -198,6 +200,8 @@ describe("UserService", () => {
       expect(userResult.Role).toBe(UserRole.USER);
       expect(adminResult.Role).toBe(UserRole.ADMIN);
       expect(userResult.Role).not.toBe(adminResult.Role);
+      expect(userResult).not.toHaveProperty("Password");
+      expect(adminResult).not.toHaveProperty("Password");
     });
   });
 
@@ -218,15 +222,24 @@ describe("UserService", () => {
       expect(result.data[2]!.Name).toBe("Maria Santos");
     });
 
-    it("should return users with all required fields", async () => {
+    it("should not return password field in any user", async () => {
+      const result = await userService.getAllUsers();
+
+      result.data.forEach((user) => {
+        expect(user).not.toHaveProperty("Password");
+        expect((user as any).Password).toBeUndefined();
+      });
+    });
+
+    it("should return users with all required fields except password", async () => {
       const result = await userService.getAllUsers();
 
       result.data.forEach((user) => {
         expect(user.Id).toBeDefined();
         expect(user.Name).toBeDefined();
         expect(user.email).toBeDefined();
-        expect(user.Password).toBeDefined();
         expect(user.Role).toBeDefined();
+        expect(user).not.toHaveProperty("Password");
       });
     });
 
@@ -265,7 +278,7 @@ describe("UserService", () => {
       expect(result.email).toBe("joao.updated@example.com");
     });
 
-    it("should hash new password on update", async () => {
+    it("should not return password in update response", async () => {
       const updatedUser: User = {
         Id: 1,
         Name: "João Silva",
@@ -276,8 +289,8 @@ describe("UserService", () => {
 
       const result = await userService.updateUser(updatedUser);
 
-      expect(result.Password).not.toBe("brandNewPassword123");
-      expect(result.Password.length).toBeGreaterThan(20);
+      expect(result).not.toHaveProperty("Password");
+      expect((result as any).Password).toBeUndefined();
     });
 
     it("should preserve user id on update", async () => {
@@ -293,6 +306,7 @@ describe("UserService", () => {
 
       expect(result.Id).toBe(2);
       expect(result.Role).toBe(UserRole.ADMIN);
+      expect(result).not.toHaveProperty("Password");
     });
 
     it("should allow updating all user fields", async () => {
@@ -309,6 +323,7 @@ describe("UserService", () => {
       expect(result.Name).toBe(updatedUser.Name);
       expect(result.email).toBe(updatedUser.email);
       expect(result.Role).toBe(updatedUser.Role);
+      expect(result).not.toHaveProperty("Password");
     });
   });
 

@@ -13,6 +13,13 @@ export type User = {
   Role: UserRole;
 };
 
+export type UserSecure = {
+  Id: Number;
+  Name: string;
+  email: string;
+  Role: UserRole;
+};
+
 // DTOs
 export const userCreateDto = z.object({
   Name: z.string().min(1, "Name is required"),

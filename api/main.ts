@@ -22,11 +22,10 @@ app.get("/health", (req, res) => {
 });
 
 // Protected Routes (require authentication)
-app.use(authMiddleware);
-app.use("/api/users", userRouter);
-app.use("/api/barbers", barberRouter);
-app.use("/api/specialties", specialtyRouter);
-app.use("/api/appointments", appointmentRouter);
+app.use("/api/users",authMiddleware ,userRouter);
+app.use("/api/barbers",authMiddleware, barberRouter);
+app.use("/api/specialties",authMiddleware, specialtyRouter);
+app.use("/api/appointments",authMiddleware, appointmentRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on port: ${PORT}`);

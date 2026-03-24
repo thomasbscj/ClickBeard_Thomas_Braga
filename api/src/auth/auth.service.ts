@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { User, UserRole } from "../user/user.model";
+import { User, UserRole, UserSecure } from "../user/user.model";
 import { userRepository } from "../user/user.repository";
 import { refreshTokenRepository } from "./refreshToken.repository";
 import { randomBytes } from "crypto";
@@ -13,7 +13,7 @@ interface JWTPayload {
 interface AuthResponse {
   token: string;
   refreshToken: string;
-  user: User;
+  user: UserSecure;
 }
 
 interface RefreshResponse {
@@ -35,6 +35,11 @@ export class AuthService {
     if (!this.tokenRepository) {
       this.tokenRepository = refreshTokenRepository;
     }
+  }
+
+  private removePassword(user: User): UserSecure {
+    const { Password, ...userSecure } = user;
+    return userSecure as UserSecure;
   }
 
   private generateToken(payload: JWTPayload): string {
@@ -95,7 +100,7 @@ export class AuthService {
     return {
       token,
       refreshToken,
-      user: newUser,
+      user: this.removePassword(newUser),
     };
   }
 
@@ -136,7 +141,7 @@ export class AuthService {
     return {
       token,
       refreshToken,
-      user,
+      user: this.removePassword(user),
     };
   }
 

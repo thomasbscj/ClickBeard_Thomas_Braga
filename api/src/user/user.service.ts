@@ -1,14 +1,16 @@
 import bcrypt from "bcrypt";
-import { User } from "./user.model";
+import { User, UserSecure } from "./user.model";
 import { id, PaginationParams, PaginatedResponse } from "../types/types";
 import { userRepository } from "./user.repository";
 import type { IUserRepository } from "./user.repository";
 
 interface IUserService {
-  createUser(user: User): Promise<User>;
-  getUserById(id: id): Promise<User>;
-  getAllUsers(pagination?: PaginationParams): Promise<PaginatedResponse<User>>;
-  updateUser(user: User): Promise<User>;
+  createUser(user: User): Promise<UserSecure>;
+  getUserById(id: id): Promise<UserSecure>;
+  getAllUsers(
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<UserSecure>>;
+  updateUser(user: User): Promise<UserSecure>;
   deleteUserById(id: id): Promise<void>;
 }
 
@@ -20,30 +22,42 @@ export class UserService implements IUserService {
     return bcrypt.hash(password, saltRounds);
   }
 
-  async createUser(user: User): Promise<User> {
+  private removePassword(user: User): UserSecure {
+    const { Password, ...userSecure } = user;
+    return userSecure as UserSecure;
+  }
+
+  async createUser(user: User): Promise<UserSecure> {
     const hashedPassword = await this.hashPassword(user.Password);
-    return this.userRepository.createUser({
+    const createdUser = await this.userRepository.createUser({
       ...user,
       Password: hashedPassword,
     });
+    return this.removePassword(createdUser);
   }
 
-  async getUserById(id: id): Promise<User> {
-    return this.userRepository.getUserById(id);
+  async getUserById(id: id): Promise<UserSecure> {
+    const user = await this.userRepository.getUserById(id);
+    return this.removePassword(user);
   }
 
   async getAllUsers(
     pagination?: PaginationParams,
-  ): Promise<PaginatedResponse<User>> {
-    return this.userRepository.getAllUsers(pagination);
+  ): Promise<PaginatedResponse<UserSecure>> {
+    const result = await this.userRepository.getAllUsers(pagination);
+    return {
+      ...result,
+      data: result.data.map((user) => this.removePassword(user)),
+    };
   }
 
-  async updateUser(user: User): Promise<User> {
+  async updateUser(user: User): Promise<UserSecure> {
     const hashedPassword = await this.hashPassword(user.Password);
-    return this.userRepository.updateUser({
+    const updatedUser = await this.userRepository.updateUser({
       ...user,
       Password: hashedPassword,
     });
+    return this.removePassword(updatedUser);
   }
 
   async deleteUserById(id: id): Promise<void> {
