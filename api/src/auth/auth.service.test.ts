@@ -3,6 +3,12 @@ import { User, UserRole } from "../user/user.model";
 import type { IUserRepository } from "../user/user.repository";
 import { PaginatedResponse } from "../types/types";
 import { AuthService } from "./auth.service";
+import { createHash } from "crypto";
+
+// Helper to hash token like the repository does
+const hashToken = (token: string): string => {
+  return createHash("sha256").update(token).digest("hex");
+};
 
 // Mock hardcoded do repositório de User para Auth
 const mockUserRepository: IUserRepository = {
@@ -73,14 +79,17 @@ const mockRefreshTokenRepository = {
   },
 
   isSessionValid: async (refreshToken: string): Promise<boolean> => {
-    return refreshToken === "valid-refresh-token";
+    // Valid token is hashed
+    const hashedValid = hashToken("valid-refresh-token");
+    return hashToken(refreshToken) === hashedValid;
   },
 
   getSession: async (refreshToken: string) => {
-    if (refreshToken === "valid-refresh-token") {
+    const hashedValid = hashToken("valid-refresh-token");
+    if (hashToken(refreshToken) === hashedValid) {
       return {
         userId: 1,
-        refreshToken,
+        refreshToken: hashedValid,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         user: {
           id: 1,

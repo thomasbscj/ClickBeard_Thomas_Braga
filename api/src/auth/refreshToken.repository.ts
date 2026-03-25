@@ -1,26 +1,34 @@
 import { db } from "../repository/repository";
+import { createHash } from "crypto";
 
 class RefreshTokenRepository {
+  private hashToken(token: string): string {
+    return createHash("sha256").update(token).digest("hex");
+  }
+
   async createSession(userId: number, token: string, expiresAt: Date) {
+    const hashedToken = this.hashToken(token);
     return await db.refreshTokenSession.create({
       data: {
         userId,
-        token,
+        token: hashedToken,
         expiresAt,
       },
     });
   }
 
   async getSession(token: string) {
+    const hashedToken = this.hashToken(token);
     return await db.refreshTokenSession.findUnique({
-      where: { token },
+      where: { token: hashedToken },
       include: { user: true },
     });
   }
 
   async revokeSession(token: string) {
+    const hashedToken = this.hashToken(token);
     return await db.refreshTokenSession.update({
-      where: { token },
+      where: { token: hashedToken },
       data: { revokedAt: new Date() },
     });
   }
