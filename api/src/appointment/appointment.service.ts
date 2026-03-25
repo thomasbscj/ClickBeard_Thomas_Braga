@@ -151,11 +151,15 @@ export class AppointmentService implements IAppointmentService {
     pagination?: PaginationParams,
   ): Promise<PaginatedResponse<Appointment>> {
     const now = this.getCurrentDate();
+    // Get today at 00:00:00
+    const todayAtMidnight = new Date(now);
+    todayAtMidnight.setHours(0, 0, 0, 0);
+
     const allAppointments =
       await this.appointmentRepository.getAllAppointments();
 
     const pastAppointments = allAppointments.data.filter(
-      (apt) => new Date(apt.datetime).getTime() < now.getTime(),
+      (apt) => new Date(apt.datetime).getTime() < todayAtMidnight.getTime(),
     );
 
     const limit = pagination?.limit || 10;
@@ -175,11 +179,15 @@ export class AppointmentService implements IAppointmentService {
     pagination?: PaginationParams,
   ): Promise<PaginatedResponse<Appointment>> {
     const now = this.getCurrentDate();
+    // Get today at 00:00:00
+    const todayAtMidnight = new Date(now);
+    todayAtMidnight.setHours(0, 0, 0, 0);
+
     const allAppointments =
       await this.appointmentRepository.getAllAppointments();
 
     const upcomingAppointments = allAppointments.data.filter(
-      (apt) => new Date(apt.datetime).getTime() >= now.getTime(),
+      (apt) => new Date(apt.datetime).getTime() >= todayAtMidnight.getTime(),
     );
 
     const limit = pagination?.limit || 10;

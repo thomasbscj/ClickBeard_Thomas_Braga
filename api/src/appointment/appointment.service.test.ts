@@ -432,10 +432,10 @@ describe("AppointmentService", () => {
   });
 
   describe("getPastAppointments", () => {
-    it("should return only past appointments", async () => {
+    it("should return only past appointments (before today at 00:00:00)", async () => {
       // Current mocked time: 2026-03-24T12:00:00
-      // Appointment 4 is 2026-03-24T13:00:00 (in the future)
-      // All others are in the future (2026-03-25)
+      // Today at midnight: 2026-03-24T00:00:00
+      // All test appointments are on or after 2026-03-24, so no past appointments
       const result = await appointmentService.getPastAppointments();
 
       expect(result).toBeDefined();
@@ -457,14 +457,15 @@ describe("AppointmentService", () => {
   });
 
   describe("getUpcomingAppointments", () => {
-    it("should return only upcoming appointments", async () => {
+    it("should return only upcoming appointments (from today at 00:00:00 onwards)", async () => {
       // Current mocked time: 2026-03-24T12:00:00
+      // Today at midnight: 2026-03-24T00:00:00
+      // Appointments 1, 2, 3, 4 are all on or after 2026-03-24T00:00:00
       const result = await appointmentService.getUpcomingAppointments();
 
       expect(result).toBeDefined();
       expect(result.data).toBeDefined();
       expect(result.pagination).toBeDefined();
-      // Appointments 1, 2, 3, 4 are all after 12:00 on 2026-03-24 or later
       expect(result.data.length).toBe(4);
     });
 
