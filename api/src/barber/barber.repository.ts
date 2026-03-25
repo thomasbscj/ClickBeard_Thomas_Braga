@@ -38,8 +38,20 @@ class BarberRepository implements IBarberRepository {
             specialty: true,
           },
         },
+        appointments: {
+          where: {
+            active: true,
+          },
+        },
       },
     });
+
+    // Calculate busy times from appointments (will be empty for new barber)
+    const APPOINTMENT_DURATION = 30; // minutes
+    const busyTimes = createdBarber.appointments.map((apt: any) => ({
+      start: new Date(apt.datetime),
+      end: new Date(apt.datetime.getTime() + APPOINTMENT_DURATION * 60000),
+    }));
 
     return {
       id: createdBarber.id,
@@ -49,6 +61,7 @@ class BarberRepository implements IBarberRepository {
       ),
       bornAt: createdBarber.bornAt,
       hiredAt: createdBarber.hiredAt,
+      busyTimes,
     };
   }
 
@@ -63,6 +76,11 @@ class BarberRepository implements IBarberRepository {
             specialty: true,
           },
         },
+        appointments: {
+          where: {
+            active: true,
+          },
+        },
       },
     });
 
@@ -70,12 +88,21 @@ class BarberRepository implements IBarberRepository {
       throw new Error("Barber not found");
     }
 
+    // Calculate busy times from appointments
+    // Each appointment occupies 30 minutes
+    const APPOINTMENT_DURATION = 30; // minutes
+    const busyTimes = barber.appointments.map((apt: any) => ({
+      start: new Date(apt.datetime),
+      end: new Date(apt.datetime.getTime() + APPOINTMENT_DURATION * 60000),
+    }));
+
     return {
       id: barber.id,
       name: barber.name,
       specialties: barber.specialties.map((bs: any) => bs.specialty.name),
       bornAt: barber.bornAt,
       hiredAt: barber.hiredAt,
+      busyTimes,
     };
   }
 
@@ -95,11 +122,17 @@ class BarberRepository implements IBarberRepository {
               specialty: true,
             },
           },
+          appointments: {
+            where: {
+              active: true,
+            },
+          },
         },
       }),
       db.barber.count(),
     ]);
 
+    const APPOINTMENT_DURATION = 30; // minutes
     return {
       data: barbers.map((barber: any) => ({
         id: barber.id,
@@ -107,6 +140,10 @@ class BarberRepository implements IBarberRepository {
         specialties: barber.specialties.map((bs: any) => bs.specialty.name),
         bornAt: barber.bornAt,
         hiredAt: barber.hiredAt,
+        busyTimes: barber.appointments.map((apt: any) => ({
+          start: new Date(apt.datetime),
+          end: new Date(apt.datetime.getTime() + APPOINTMENT_DURATION * 60000),
+        })),
       })),
       pagination: {
         limit,
@@ -150,8 +187,20 @@ class BarberRepository implements IBarberRepository {
             specialty: true,
           },
         },
+        appointments: {
+          where: {
+            active: true,
+          },
+        },
       },
     });
+
+    // Calculate busy times from appointments
+    const APPOINTMENT_DURATION = 30; // minutes
+    const busyTimes = updatedBarber.appointments.map((apt: any) => ({
+      start: new Date(apt.datetime),
+      end: new Date(apt.datetime.getTime() + APPOINTMENT_DURATION * 60000),
+    }));
 
     return {
       id: updatedBarber.id,
@@ -161,6 +210,7 @@ class BarberRepository implements IBarberRepository {
       ),
       bornAt: updatedBarber.bornAt,
       hiredAt: updatedBarber.hiredAt,
+      busyTimes,
     };
   }
 

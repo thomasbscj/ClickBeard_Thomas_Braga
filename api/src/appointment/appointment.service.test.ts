@@ -250,7 +250,7 @@ describe("AppointmentService", () => {
         id: 0,
         userId: 1,
         barberId: 1,
-        datetime: new Date("2026-03-25T22:00:00"),
+        datetime: new Date("2026-03-25T21:00:00Z"),
         active: true,
       };
 
@@ -266,7 +266,7 @@ describe("AppointmentService", () => {
         id: 0,
         userId: 1,
         barberId: 1,
-        datetime: new Date("2026-03-25T10:00:00"),
+        datetime: new Date("2026-03-25T10:00:00Z"),
         active: true,
       };
 
@@ -404,7 +404,7 @@ describe("AppointmentService", () => {
         id: 1,
         userId: 1,
         barberId: 1,
-        datetime: new Date("2026-03-25T22:00:00"),
+        datetime: new Date("2026-03-25T21:00:00Z"),
         active: true,
       };
 

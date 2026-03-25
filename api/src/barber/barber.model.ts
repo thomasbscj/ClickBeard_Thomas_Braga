@@ -1,11 +1,17 @@
 import { z } from "zod";
 
+export type BusyTime = {
+  start: Date;
+  end: Date;
+};
+
 export type Barber = {
   id: number;
   name: string;
   specialties: string[]; // Array de nomes de especialidades
   bornAt: number;
   hiredAt: Date;
+  busyTimes?: BusyTime[]; // Array de horários em que o barbeiro está ocupado
 };
 
 export type BarberCreateInput = Omit<Barber, "id">;
