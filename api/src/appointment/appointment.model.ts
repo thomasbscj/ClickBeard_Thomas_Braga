@@ -9,16 +9,15 @@ export type Appointment = {
 };
 
 export const appointmentCreateDto = z.object({
-  userId: z.number().int("UserId must be an integer"),
   barberId: z.number().int("BarberId must be an integer"),
-  datetime: z.string().datetime("Invalid datetime format"),
+  datetime: z.iso.datetime("Invalid datetime format"),
 });
 
 export const appointmentUpdateDto = z.object({
   id: z.number().int("Id must be an integer"),
   userId: z.number().int("UserId must be an integer"),
   barberId: z.number().int("BarberId must be an integer"),
-  datetime: z.string().datetime("Invalid datetime format"),
+  datetime: z.iso.datetime("Invalid datetime format"),
 });
 
 export type AppointmentCreateDto = z.infer<typeof appointmentCreateDto>;

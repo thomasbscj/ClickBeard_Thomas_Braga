@@ -17,9 +17,17 @@ export const appointmentRouter = Router();
 // Create Appointment
 appointmentRouter.post("/", async (req: Request, res: Response) => {
   try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
     const validatedData = validateAppointmentCreate(req.body);
     const appointment = await appointmentService.createAppointment({
       ...validatedData,
+      userId,
       id: 0,
       datetime: new Date(validatedData.datetime),
     } as Appointment);
