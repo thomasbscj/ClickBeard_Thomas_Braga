@@ -127,6 +127,39 @@ describe("AuthService", () => {
         "User with this email already exists",
       );
     });
+
+    it("should return only message and email on successful registration", async () => {
+      const userInput: User = {
+        Id: 0,
+        Name: "New User",
+        email: "newuser@example.com",
+        Password: "password123",
+        Role: UserRole.ADMIN,
+      };
+
+      const result = await authService.register(userInput);
+
+      expect(result).toHaveProperty("message");
+      expect(result).toHaveProperty("email");
+      expect(result).not.toHaveProperty("token");
+      expect(result).not.toHaveProperty("refreshToken");
+      expect(result).not.toHaveProperty("user");
+    });
+
+    it("should return correct email in response", async () => {
+      const userInput: User = {
+        Id: 0,
+        Name: "Test User",
+        email: "testuser@example.com",
+        Password: "password123",
+        Role: UserRole.USER,
+      };
+
+      const result = await authService.register(userInput);
+
+      expect(result.email).toBe("testuser@example.com");
+      expect(result.message).toBe("User registered successfully");
+    });
   });
 
   describe("login", () => {

@@ -6,9 +6,9 @@ export const loginDto = z.object({
 });
 
 export const registerDto = z.object({
-  Name: z.string().min(1, "Name is required"),
+  name: z.string().min(1, "Name is required"),
   email: z.email("Invalid email"),
-  Password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 export const refreshTokenDto = z.object({

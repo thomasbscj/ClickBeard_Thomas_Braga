@@ -16,6 +16,11 @@ interface AuthResponse {
   user: UserSecure;
 }
 
+interface RegisterResponse {
+  message: string;
+  email: string;
+}
+
 interface RefreshResponse {
   token: string;
   refreshToken: string;
@@ -64,7 +69,7 @@ export class AuthService {
     return bcrypt.compare(password, hashedPassword);
   }
 
-  async register(user: User): Promise<AuthResponse> {
+  async register(user: User): Promise<RegisterResponse> {
     // Check if user already exists
     const usersResponse = await this.repository.getAllUsers();
     const userExists = usersResponse.data.some((u) => u.email === user.email);
@@ -76,31 +81,16 @@ export class AuthService {
     // Hash password
     const hashedPassword = await this.hashPassword(user.Password);
 
-    // Create user
+    // Create user with USER role (enforce that registrations are always regular users)
     const newUser = await this.repository.createUser({
       ...user,
       Password: hashedPassword,
+      Role: UserRole.USER,
     });
-
-    // Generate tokens
-    const token = this.generateToken({
-      id: newUser.Id as number,
-      role: newUser.role,
-    });
-
-    const refreshToken = this.generateRefreshToken();
-    const expiresAt = new Date(Date.now() + this.REFRESH_TOKEN_EXPIRY);
-
-    await this.tokenRepository!.createSession(
-      newUser.Id as number,
-      refreshToken,
-      expiresAt,
-    );
 
     return {
-      token,
-      refreshToken,
-      user: this.removePassword(newUser),
+      message: "User registered successfully",
+      email: newUser.email,
     };
   }
 

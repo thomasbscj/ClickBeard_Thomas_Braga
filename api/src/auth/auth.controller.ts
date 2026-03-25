@@ -34,11 +34,13 @@ authRouter.post("/login", async (req: Request, res: Response) => {
 });
 
 // Register route
+// Note: This endpoint only creates a new user without logging in
+// Users must use the /login endpoint to obtain authentication tokens
 authRouter.post("/register", async (req: Request, res: Response) => {
   try {
     const validatedData = validateRegister(req.body);
-    const authResponse = await authService.register(validatedData as any);
-    res.status(201).json(authResponse);
+    const registerResponse = await authService.register(validatedData as any);
+    res.status(201).json(registerResponse);
   } catch (error) {
     if (handleValidationError(error, res)) return;
     if (error instanceof Error && error.message.includes("already exists")) {
