@@ -56,8 +56,13 @@ export class AppointmentService implements IAppointmentService {
   }
 
   private isWithinBusinessHours(datetime: Date): boolean {
-    const hour = datetime.getHours();
-    return hour >= this.OPENING_HOUR && hour < this.CLOSING_HOUR;
+    // Validate against UTC time (11:00-21:00 UTC)
+    // Using getUTCHours() to get the hour in UTC timezone
+    const hour = datetime.getUTCHours()
+    const minutes = datetime.getMinutes()
+    const notBefore = hour > this.OPENING_HOUR
+    const notAfter = hour < this.CLOSING_HOUR
+    return notBefore && notAfter;
   }
 
   private async isBarberAvailable(
@@ -86,7 +91,7 @@ export class AppointmentService implements IAppointmentService {
   ): Promise<void> {
     if (!this.isWithinBusinessHours(appointmentDateTime)) {
       throw new Error(
-        `Appointments must be scheduled between ${this.OPENING_HOUR}:00 and ${this.CLOSING_HOUR}:00`,
+        `Appointments must be scheduled between ${this.OPENING_HOUR-3}:00 and ${this.CLOSING_HOUR-3}:00`,
       );
     }
     const endTime = new Date(
@@ -240,6 +245,7 @@ export class AppointmentService implements IAppointmentService {
     const appointmentTime = appointment.datetime;
     const hoursUntilAppointment =
       (appointmentTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+      console.log(hoursUntilAppointment)
 
     if (hoursUntilAppointment < this.CANCELLATION_NOTICE_HOURS) {
       throw new Error(

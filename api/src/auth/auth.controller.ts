@@ -7,6 +7,7 @@ import {
 } from "./auth.model";
 import { handleValidationError } from "../utils/errorHandler";
 import { authMiddleware } from "../middleware/authMiddleware";
+import { UserRole } from "../user/user.model";
 
 export const authRouter = Router();
 
@@ -39,7 +40,13 @@ authRouter.post("/login", async (req: Request, res: Response) => {
 authRouter.post("/register", async (req: Request, res: Response) => {
   try {
     const validatedData = validateRegister(req.body);
-    const registerResponse = await authService.register(validatedData as any);
+    const registerResponse = await authService.register({
+      Id: 0,
+      Name: validatedData.name,
+      email: validatedData.email,
+      Password: validatedData.password,
+      Role: UserRole.USER,
+    } as any);
     res.status(201).json(registerResponse);
   } catch (error) {
     if (handleValidationError(error, res)) return;
