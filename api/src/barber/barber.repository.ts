@@ -16,20 +16,53 @@ class BarberRepository implements IBarberRepository {
   constructor() {}
 
   async createBarber(barber: BarberCreateInput): Promise<Barber> {
-    return db.barber.create({
+    // Create barber and associate specialties
+    const createdBarber = await (db.barber.create as any)({
       data: {
         name: barber.name,
-        specialtyId: barber.specialtyId,
         bornAt: barber.bornAt,
         hiredAt: barber.hiredAt,
+        specialties: {
+          create: barber.specialties.map((specialtyName) => ({
+            specialty: {
+              connect: {
+                name: specialtyName,
+              },
+            },
+          })),
+        },
+      },
+      include: {
+        specialties: {
+          include: {
+            specialty: true,
+          },
+        },
       },
     });
+
+    return {
+      id: createdBarber.id,
+      name: createdBarber.name,
+      specialties: createdBarber.specialties.map(
+        (bs: any) => bs.specialty.name,
+      ),
+      bornAt: createdBarber.bornAt,
+      hiredAt: createdBarber.hiredAt,
+    };
   }
 
   async getBarberById(id: number): Promise<Barber> {
-    const barber = await db.barber.findFirst({
+    const barber = await (db.barber.findFirst as any)({
       where: {
         id: id,
+      },
+      include: {
+        specialties: {
+          include: {
+            specialty: true,
+          },
+        },
       },
     });
 
@@ -40,7 +73,7 @@ class BarberRepository implements IBarberRepository {
     return {
       id: barber.id,
       name: barber.name,
-      specialtyId: barber.specialtyId,
+      specialties: barber.specialties.map((bs: any) => bs.specialty.name),
       bornAt: barber.bornAt,
       hiredAt: barber.hiredAt,
     };
@@ -53,18 +86,25 @@ class BarberRepository implements IBarberRepository {
     const offset = pagination?.offset || 0;
 
     const [barbers, total] = await Promise.all([
-      db.barber.findMany({
+      (db.barber.findMany as any)({
         skip: offset,
         take: limit,
+        include: {
+          specialties: {
+            include: {
+              specialty: true,
+            },
+          },
+        },
       }),
       db.barber.count(),
     ]);
 
     return {
-      data: barbers.map((barber) => ({
+      data: barbers.map((barber: any) => ({
         id: barber.id,
         name: barber.name,
-        specialtyId: barber.specialtyId,
+        specialties: barber.specialties.map((bs: any) => bs.specialty.name),
         bornAt: barber.bornAt,
         hiredAt: barber.hiredAt,
       })),
@@ -77,22 +117,48 @@ class BarberRepository implements IBarberRepository {
   }
 
   async updateBarber(barber: Barber): Promise<Barber> {
-    const updatedBarber = await db.barber.update({
+    // Delete existing specialty associations
+    const dbAny = db as any;
+    await dbAny.barberSpecialty.deleteMany({
+      where: {
+        barberId: barber.id,
+      },
+    });
+
+    // Update barber and create new specialty associations
+    const updatedBarber = await (db.barber.update as any)({
       where: {
         id: barber.id,
       },
       data: {
         name: barber.name,
-        specialtyId: barber.specialtyId,
         bornAt: barber.bornAt,
-        hiredAt: new Date(barber.hiredAt),
+        hiredAt: barber.hiredAt,
+        specialties: {
+          create: barber.specialties.map((specialtyName) => ({
+            specialty: {
+              connect: {
+                name: specialtyName,
+              },
+            },
+          })),
+        },
+      },
+      include: {
+        specialties: {
+          include: {
+            specialty: true,
+          },
+        },
       },
     });
 
     return {
       id: updatedBarber.id,
       name: updatedBarber.name,
-      specialtyId: updatedBarber.specialtyId,
+      specialties: updatedBarber.specialties.map(
+        (bs: any) => bs.specialty.name,
+      ),
       bornAt: updatedBarber.bornAt,
       hiredAt: updatedBarber.hiredAt,
     };

@@ -10,7 +10,7 @@ const mockBarberRepository: IBarberRepository = {
     return {
       id: 1,
       name: barber.name,
-      specialtyId: barber.specialtyId,
+      specialties: barber.specialties,
       bornAt: barber.bornAt,
       hiredAt: barber.hiredAt,
     };
@@ -21,9 +21,18 @@ const mockBarberRepository: IBarberRepository = {
       return {
         id: 1,
         name: "João Silva",
-        specialtyId: "corte-cabelo",
+        specialties: ["corte-cabelo", "barba"],
         bornAt: 1990,
         hiredAt: new Date("2020-01-15"),
+      };
+    }
+    if (id === 2) {
+      return {
+        id: 2,
+        name: "Pedro Santos",
+        specialties: ["barba", "design-sobrancelha"],
+        bornAt: 1985,
+        hiredAt: new Date("2019-06-20"),
       };
     }
     throw new Error("Barber not found");
@@ -35,21 +44,21 @@ const mockBarberRepository: IBarberRepository = {
         {
           id: 1,
           name: "João Silva",
-          specialtyId: "corte-cabelo",
+          specialties: ["corte-cabelo", "barba"],
           bornAt: 1990,
           hiredAt: new Date("2020-01-15"),
         },
         {
           id: 2,
           name: "Pedro Santos",
-          specialtyId: "barba",
+          specialties: ["barba", "design-sobrancelha"],
           bornAt: 1985,
           hiredAt: new Date("2019-06-20"),
         },
         {
           id: 3,
           name: "Carlos Costa",
-          specialtyId: "coloracao",
+          specialties: ["coloracao", "escova-progressiva", "lavagem"],
           bornAt: 1992,
           hiredAt: new Date("2021-03-10"),
         },
@@ -62,7 +71,7 @@ const mockBarberRepository: IBarberRepository = {
     return {
       id: barber.id,
       name: barber.name,
-      specialtyId: barber.specialtyId,
+      specialties: barber.specialties,
       bornAt: barber.bornAt,
       hiredAt: barber.hiredAt,
     };
@@ -87,7 +96,7 @@ describe("BarberService", () => {
     it("should create a new barber successfully", async () => {
       const barberInput: BarberCreateInput = {
         name: "Ana Maria",
-        specialtyId: "design-sobrancelha",
+        specialties: ["design-sobrancelha", "lavagem"],
         bornAt: 1995,
         hiredAt: new Date("2022-05-01"),
       };
@@ -97,14 +106,14 @@ describe("BarberService", () => {
       expect(result).toBeDefined();
       expect(result.id).toBe(1);
       expect(result.name).toBe("Ana Maria");
-      expect(result.specialtyId).toBe("design-sobrancelha");
+      expect(result.specialties).toEqual(["design-sobrancelha", "lavagem"]);
       expect(result.bornAt).toBe(1995);
     });
 
     it("should preserve all barber input fields", async () => {
       const barberInput: BarberCreateInput = {
         name: "Marcos Oliveira",
-        specialtyId: "lavagem",
+        specialties: ["corte-cabelo", "barba", "design-sobrancelha"],
         bornAt: 1988,
         hiredAt: new Date("2018-11-30"),
       };
@@ -112,9 +121,25 @@ describe("BarberService", () => {
       const result = await barberService.createBarber(barberInput);
 
       expect(result.name).toBe(barberInput.name);
-      expect(result.specialtyId).toBe(barberInput.specialtyId);
+      expect(result.specialties).toEqual(barberInput.specialties);
       expect(result.bornAt).toBe(barberInput.bornAt);
       expect(result.hiredAt).toEqual(barberInput.hiredAt);
+    });
+
+    it("should handle multiple specialties for a barber", async () => {
+      const barberInput: BarberCreateInput = {
+        name: "Multi Specialist",
+        specialties: ["corte-cabelo", "barba", "coloracao"],
+        bornAt: 1990,
+        hiredAt: new Date("2020-01-01"),
+      };
+
+      const result = await barberService.createBarber(barberInput);
+
+      expect(result.specialties.length).toBe(3);
+      expect(result.specialties).toContain("corte-cabelo");
+      expect(result.specialties).toContain("barba");
+      expect(result.specialties).toContain("coloracao");
     });
   });
 
@@ -125,7 +150,7 @@ describe("BarberService", () => {
       expect(result).toBeDefined();
       expect(result.id).toBe(1);
       expect(result.name).toBe("João Silva");
-      expect(result.specialtyId).toBe("corte-cabelo");
+      expect(result.specialties).toBeDefined();
     });
 
     it("should throw error when barber not found", async () => {
@@ -134,11 +159,19 @@ describe("BarberService", () => {
       );
     });
 
-    it("should return correct barber details", async () => {
+    it("should return correct barber details with multiple specialties", async () => {
       const result = await barberService.getBarberById(1);
 
       expect(result.bornAt).toBe(1990);
       expect(result.hiredAt).toEqual(new Date("2020-01-15"));
+      expect(result.specialties).toEqual(["corte-cabelo", "barba"]);
+    });
+
+    it("should return barber with multiple specialties", async () => {
+      const result = await barberService.getBarberById(2);
+
+      expect(result.specialties.length).toBeGreaterThan(1);
+      expect(result.specialties).toContain("barba");
     });
   });
 
@@ -159,16 +192,29 @@ describe("BarberService", () => {
       expect(result.data[2]!.name).toBe("Carlos Costa");
     });
 
-    it("should return barbers with all required fields", async () => {
+    it("should return barbers with all required fields including specialties", async () => {
       const result = await barberService.getAllBarbers();
 
       result.data.forEach((barber: Barber) => {
         expect(barber.id).toBeDefined();
         expect(barber.name).toBeDefined();
-        expect(barber.specialtyId).toBeDefined();
+        expect(barber.specialties).toBeDefined();
+        expect(Array.isArray(barber.specialties)).toBe(true);
         expect(barber.bornAt).toBeDefined();
         expect(barber.hiredAt).toBeDefined();
       });
+    });
+
+    it("should return barbers with multiple specialties", async () => {
+      const result = await barberService.getAllBarbers();
+
+      const barberWithMultipleSpecialties = result.data.find(
+        (b) => b.specialties.length > 1,
+      );
+      expect(barberWithMultipleSpecialties).toBeDefined();
+      expect(barberWithMultipleSpecialties!.specialties.length).toBeGreaterThan(
+        1,
+      );
     });
   });
 
@@ -177,7 +223,7 @@ describe("BarberService", () => {
       const updatedBarber: Barber = {
         id: 1,
         name: "João Silva Updated",
-        specialtyId: "corte-barba",
+        specialties: ["corte-cabelo", "coloracao"],
         bornAt: 1991,
         hiredAt: new Date("2020-01-15"),
       };
@@ -187,14 +233,14 @@ describe("BarberService", () => {
       expect(result).toBeDefined();
       expect(result.id).toBe(1);
       expect(result.name).toBe("João Silva Updated");
-      expect(result.specialtyId).toBe("corte-barba");
+      expect(result.specialties).toEqual(["corte-cabelo", "coloracao"]);
     });
 
     it("should preserve all barber fields on update", async () => {
       const updatedBarber: Barber = {
         id: 2,
         name: "Pedro Santos Updated",
-        specialtyId: "coloracao",
+        specialties: ["barba", "coloracao", "design-sobrancelha"],
         bornAt: 1986,
         hiredAt: new Date("2019-06-20"),
       };
@@ -203,9 +249,27 @@ describe("BarberService", () => {
 
       expect(result.id).toBe(updatedBarber.id);
       expect(result.name).toBe(updatedBarber.name);
-      expect(result.specialtyId).toBe(updatedBarber.specialtyId);
+      expect(result.specialties).toEqual(updatedBarber.specialties);
       expect(result.bornAt).toBe(updatedBarber.bornAt);
       expect(result.hiredAt).toEqual(updatedBarber.hiredAt);
+    });
+
+    it("should update barber specialties", async () => {
+      const updatedBarber: Barber = {
+        id: 1,
+        name: "João Silva",
+        specialties: ["barba", "lavagem", "design-sobrancelha"],
+        bornAt: 1990,
+        hiredAt: new Date("2020-01-15"),
+      };
+
+      const result = await barberService.updateBarber(updatedBarber);
+
+      expect(result.specialties).toEqual([
+        "barba",
+        "lavagem",
+        "design-sobrancelha",
+      ]);
     });
   });
 

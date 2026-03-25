@@ -48,7 +48,7 @@ barberRouter.post("/", async (req: Request, res: Response) => {
     const validatedData = validateBarberCreate(req.body);
     const barber = await barberService.createBarber({
       name: validatedData.name,
-      specialtyId: validatedData.specialtyId,
+      specialties: validatedData.specialties,
       bornAt: validatedData.bornAt,
       hiredAt: new Date(validatedData.hiredAt),
     });
@@ -69,7 +69,10 @@ barberRouter.put("/:id", async (req: Request, res: Response) => {
       ...req.body,
     });
     const barber = await barberService.updateBarber({
-      ...validatedData,
+      id: validatedData.id,
+      name: validatedData.name,
+      specialties: validatedData.specialties,
+      bornAt: validatedData.bornAt,
       hiredAt: new Date(validatedData.hiredAt),
     });
     res.status(200).json(barber);

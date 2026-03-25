@@ -3,7 +3,7 @@ import { z } from "zod";
 export type Barber = {
   id: number;
   name: string;
-  specialtyId: string;
+  specialties: string[]; // Array de nomes de especialidades
   bornAt: number;
   hiredAt: Date;
 };
@@ -12,7 +12,9 @@ export type BarberCreateInput = Omit<Barber, "id">;
 
 export const barberCreateDto = z.object({
   name: z.string().min(1, "Name is required"),
-  specialtyId: z.string().min(1, "SpecialtyId is required"),
+  specialties: z
+    .array(z.string().min(1, "Specialty name is required"))
+    .min(1, "At least one specialty is required"),
   bornAt: z
     .number()
     .int("Birth year must be an integer")
@@ -23,7 +25,9 @@ export const barberCreateDto = z.object({
 export const barberUpdateDto = z.object({
   id: z.number().int("Id must be an integer"),
   name: z.string().min(1, "Name is required"),
-  specialtyId: z.string().min(1, "SpecialtyId is required"),
+  specialties: z
+    .array(z.string().min(1, "Specialty name is required"))
+    .min(1, "At least one specialty is required"),
   bornAt: z
     .number()
     .int("Birth year must be an integer")

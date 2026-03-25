@@ -20,7 +20,7 @@ enum Role {
 model Specialty {
   name        String   @id @unique
   description String
-  barbers     Barber[]
+  barbers     BarberSpecialty[]
 }
 
 model User {
@@ -36,11 +36,20 @@ model User {
 model Barber {
   id           Int           @id @default(autoincrement())
   name         String        @unique
-  specialty    Specialty     @relation(fields: [specialtyId], references: [name])
-  specialtyId  String
+  specialties  BarberSpecialty[]
   bornAt Int 
   hiredAt DateTime
   appointments Appointment[]
+}
+
+model BarberSpecialty {
+  id          Int     @id @default(autoincrement())
+  barber      Barber  @relation(fields: [barberId], references: [id], onDelete: Cascade)
+  barberId    Int
+  specialty   Specialty @relation(fields: [specialtyName], references: [name], onDelete: Cascade)
+  specialtyName String
+
+  @@unique([barberId, specialtyName])
 }
 
 model Appointment {
