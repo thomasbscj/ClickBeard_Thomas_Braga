@@ -32,7 +32,7 @@ export const barberUpdateDto = z.object({
     .number()
     .int("Birth year must be an integer")
     .positive("Birth year must be positive"),
-  hiredAt: z.string().datetime({ message: "Invalid hire date format" }),
+  hiredAt: z.iso.datetime({ message: "Invalid hire date format" }),
 });
 
 export type BarberCreateDto = z.infer<typeof barberCreateDto>;

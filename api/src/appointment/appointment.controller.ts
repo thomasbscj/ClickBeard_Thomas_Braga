@@ -34,6 +34,17 @@ appointmentRouter.post("/", async (req: Request, res: Response) => {
     res.status(201).json(appointment);
   } catch (error) {
     if (handleValidationError(error, res)) return;
+
+    // Handle business logic errors with 400
+    if (
+      error instanceof Error &&
+      (error.message.includes("Appointments must be scheduled between") ||
+        error.message.includes("Barber is not available"))
+    ) {
+      res.status(400).json({ error: error.message });
+      return;
+    }
+
     console.error("Error creating appointment:", error);
     res.status(500).json({ error: "Failed to create appointment" });
   }
@@ -104,6 +115,43 @@ appointmentRouter.get(
 );
 
 appointmentRouter.use(adminMiddleware);
+
+// Get Past Appointments
+appointmentRouter.get("/past", async (req: Request, res: Response) => {
+  try {
+    const { limit, offset } = parsePaginationParams(
+      req.query.limit,
+      req.query.offset,
+    );
+    const result = await appointmentService.getPastAppointments({
+      limit,
+      offset,
+    });
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error fetching past appointments:", error);
+    res.status(500).json({ error: "Failed to get past appointments" });
+  }
+});
+
+// Get Upcoming Appointments
+appointmentRouter.get("/upcoming", async (req: Request, res: Response) => {
+  try {
+    const { limit, offset } = parsePaginationParams(
+      req.query.limit,
+      req.query.offset,
+    );
+    const result = await appointmentService.getUpcomingAppointments({
+      limit,
+      offset,
+    });
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error fetching upcoming appointments:", error);
+    res.status(500).json({ error: "Failed to get upcoming appointments" });
+  }
+});
+
 // Get Appointment by ID
 appointmentRouter.get("/:id", async (req: Request, res: Response) => {
   try {
@@ -114,24 +162,6 @@ appointmentRouter.get("/:id", async (req: Request, res: Response) => {
     if (handleNotFoundError(error, res, "Appointment")) return;
     console.error("Error fetching appointment:", error);
     res.status(500).json({ error: "Failed to get appointment" });
-  }
-});
-
-// Get All Appointments
-appointmentRouter.get("/", async (req: Request, res: Response) => {
-  try {
-    const { limit, offset } = parsePaginationParams(
-      req.query.limit,
-      req.query.offset,
-    );
-    const result = await appointmentService.getAllAppointments({
-      limit,
-      offset,
-    });
-    res.status(200).json(result);
-  } catch (error) {
-    console.error("Error fetching appointments:", error);
-    res.status(500).json({ error: "Failed to get appointments" });
   }
 });
 

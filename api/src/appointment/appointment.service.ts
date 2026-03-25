@@ -13,6 +13,12 @@ interface IAppointmentService {
     userId: number,
     pagination?: PaginationParams,
   ): Promise<PaginatedResponse<Appointment>>;
+  getPastAppointments(
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<Appointment>>;
+  getUpcomingAppointments(
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<Appointment>>;
   updateAppointment(appointment: Appointment): Promise<Appointment>;
   deleteAppointmentById(id: number): Promise<void>;
   cancelAppointment(
@@ -22,8 +28,8 @@ interface IAppointmentService {
 }
 
 export class AppointmentService implements IAppointmentService {
-  private readonly OPENING_HOUR = 8;
-  private readonly CLOSING_HOUR = 18;
+  private readonly OPENING_HOUR = 11;
+  private readonly CLOSING_HOUR = 21;
   private readonly APPOINTMENT_DURATION = 30;
   private readonly CANCELLATION_NOTICE_HOURS = 2;
 
@@ -35,10 +41,15 @@ export class AppointmentService implements IAppointmentService {
   private roundToNearestHalfHour(datetime: Date): Date {
     const minutes = datetime.getMinutes();
     const rounded = new Date(datetime);
-    if (minutes < 30) {
+
+    if (minutes <= 15) {
       rounded.setMinutes(0, 0, 0);
-    } else {
+    } else if (minutes <= 45) {
       rounded.setMinutes(30, 0, 0);
+    } else {
+      // minutes > 45, round to next hour
+      rounded.setHours(rounded.getHours() + 1);
+      rounded.setMinutes(0, 0, 0);
     }
 
     return rounded;
@@ -134,6 +145,54 @@ export class AppointmentService implements IAppointmentService {
       userId,
       pagination,
     );
+  }
+
+  async getPastAppointments(
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<Appointment>> {
+    const now = this.getCurrentDate();
+    const allAppointments =
+      await this.appointmentRepository.getAllAppointments();
+
+    const pastAppointments = allAppointments.data.filter(
+      (apt) => new Date(apt.datetime).getTime() < now.getTime(),
+    );
+
+    const limit = pagination?.limit || 10;
+    const offset = pagination?.offset || 0;
+
+    return {
+      data: pastAppointments.slice(offset, offset + limit),
+      pagination: {
+        limit,
+        offset,
+        total: pastAppointments.length,
+      },
+    };
+  }
+
+  async getUpcomingAppointments(
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<Appointment>> {
+    const now = this.getCurrentDate();
+    const allAppointments =
+      await this.appointmentRepository.getAllAppointments();
+
+    const upcomingAppointments = allAppointments.data.filter(
+      (apt) => new Date(apt.datetime).getTime() >= now.getTime(),
+    );
+
+    const limit = pagination?.limit || 10;
+    const offset = pagination?.offset || 0;
+
+    return {
+      data: upcomingAppointments.slice(offset, offset + limit),
+      pagination: {
+        limit,
+        offset,
+        total: upcomingAppointments.length,
+      },
+    };
   }
 
   async updateAppointment(appointment: Appointment): Promise<Appointment> {

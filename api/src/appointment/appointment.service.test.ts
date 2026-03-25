@@ -22,7 +22,7 @@ const mockAppointmentRepository: IAppointmentRepository = {
         id: 1,
         userId: 1,
         barberId: 1,
-        datetime: new Date("2026-03-25T10:00:00"),
+        datetime: new Date("2026-03-25T14:00:00"),
         active: true,
       };
     }
@@ -43,7 +43,7 @@ const mockAppointmentRepository: IAppointmentRepository = {
         id: 5,
         userId: 1,
         barberId: 2,
-        datetime: new Date("2026-04-01T14:00:00"),
+        datetime: new Date("2026-04-01T15:00:00"),
         active: true,
       };
     }
@@ -58,21 +58,21 @@ const mockAppointmentRepository: IAppointmentRepository = {
         id: 1,
         userId: 1,
         barberId: 1,
-        datetime: new Date("2026-03-25T10:00:00"),
+        datetime: new Date("2026-03-25T14:00:00"),
         active: true,
       },
       {
         id: 2,
         userId: 2,
         barberId: 1,
-        datetime: new Date("2026-03-25T10:30:00"),
+        datetime: new Date("2026-03-25T14:30:00"),
         active: true,
       },
       {
         id: 3,
         userId: 1,
         barberId: 2,
-        datetime: new Date("2026-03-25T14:00:00"),
+        datetime: new Date("2026-03-25T15:00:00"),
         active: true,
       },
       {
@@ -106,21 +106,21 @@ const mockAppointmentRepository: IAppointmentRepository = {
         id: 1,
         userId: 1,
         barberId: 1,
-        datetime: new Date("2026-03-25T10:00:00"),
+        datetime: new Date("2026-03-25T14:00:00"),
         active: true,
       },
       {
         id: 2,
         userId: 2,
         barberId: 1,
-        datetime: new Date("2026-03-25T10:30:00"),
+        datetime: new Date("2026-03-25T14:30:00"),
         active: true,
       },
       {
         id: 3,
         userId: 1,
         barberId: 2,
-        datetime: new Date("2026-03-25T14:00:00"),
+        datetime: new Date("2026-03-25T15:00:00"),
         active: true,
       },
       {
@@ -182,7 +182,7 @@ describe("AppointmentService", () => {
         id: 5,
         userId: 2,
         barberId: 2,
-        datetime: new Date("2026-03-27T09:00:00"),
+        datetime: new Date("2026-03-27T14:00:00"),
         active: true,
       };
 
@@ -201,7 +201,7 @@ describe("AppointmentService", () => {
         id: 0,
         userId: 2,
         barberId: 2,
-        datetime: new Date("2026-03-25T10:15:00"),
+        datetime: new Date("2026-03-25T14:15:00"),
         active: true,
       };
 
@@ -209,10 +209,43 @@ describe("AppointmentService", () => {
         await appointmentService.createAppointment(appointmentInput);
 
       expect(result).toBeDefined();
-      expect(result.datetime.getMinutes().toString()).toMatch(/^(0|30)$/);
+      expect(result.datetime.getMinutes()).toBe(0);
     });
 
-    it("should validate business hours (8:00-18:00)", async () => {
+    it("should round to 30 minutes when between 16-45", async () => {
+      const appointmentInput: Appointment = {
+        id: 0,
+        userId: 2,
+        barberId: 2,
+        datetime: new Date("2026-03-25T14:20:00"),
+        active: true,
+      };
+
+      const result =
+        await appointmentService.createAppointment(appointmentInput);
+
+      expect(result).toBeDefined();
+      expect(result.datetime.getMinutes()).toBe(30);
+    });
+
+    it("should round to next hour when minutes > 45", async () => {
+      const appointmentInput: Appointment = {
+        id: 0,
+        userId: 2,
+        barberId: 3,
+        datetime: new Date("2026-03-25T14:50:00"),
+        active: true,
+      };
+
+      const result =
+        await appointmentService.createAppointment(appointmentInput);
+
+      expect(result).toBeDefined();
+      expect(result.datetime.getMinutes()).toBe(0);
+      expect(result.datetime.getHours()).toBe(15);
+    });
+
+    it("should validate business hours (11:00-21:00)", async () => {
       const appointmentInput: Appointment = {
         id: 0,
         userId: 1,
@@ -224,7 +257,7 @@ describe("AppointmentService", () => {
       await expect(
         appointmentService.createAppointment(appointmentInput),
       ).rejects.toThrow(
-        "Appointments must be scheduled between 8:00 and 18:00",
+        "Appointments must be scheduled between 11:00 and 21:00",
       );
     });
 
@@ -233,14 +266,14 @@ describe("AppointmentService", () => {
         id: 0,
         userId: 1,
         barberId: 1,
-        datetime: new Date("2026-03-25T07:00:00"),
+        datetime: new Date("2026-03-25T10:00:00"),
         active: true,
       };
 
       await expect(
         appointmentService.createAppointment(appointmentInput),
       ).rejects.toThrow(
-        "Appointments must be scheduled between 8:00 and 18:00",
+        "Appointments must be scheduled between 11:00 and 21:00",
       );
     });
 
@@ -249,7 +282,7 @@ describe("AppointmentService", () => {
         id: 0,
         userId: 3,
         barberId: 1,
-        datetime: new Date("2026-03-25T10:00:00"),
+        datetime: new Date("2026-03-25T14:00:00"),
         active: true,
       };
 
@@ -283,7 +316,7 @@ describe("AppointmentService", () => {
       expect(result.active).toBe(true);
       expect(result.barberId).toBe(1);
       expect(result.userId).toBe(1);
-      expect(result.datetime).toEqual(new Date("2026-03-25T10:00:00"));
+      expect(result.datetime).toEqual(new Date("2026-03-25T14:00:00"));
     });
   });
 
@@ -354,7 +387,7 @@ describe("AppointmentService", () => {
         id: 1,
         userId: 1,
         barberId: 2,
-        datetime: new Date("2026-03-25T14:30:00"),
+        datetime: new Date("2026-03-25T15:30:00"),
         active: true,
       };
 
@@ -371,14 +404,14 @@ describe("AppointmentService", () => {
         id: 1,
         userId: 1,
         barberId: 1,
-        datetime: new Date("2026-03-25T20:00:00"),
+        datetime: new Date("2026-03-25T22:00:00"),
         active: true,
       };
 
       await expect(
         appointmentService.updateAppointment(updatedAppointment),
       ).rejects.toThrow(
-        "Appointments must be scheduled between 8:00 and 18:00",
+        "Appointments must be scheduled between 11:00 and 21:00",
       );
     });
 
@@ -387,7 +420,7 @@ describe("AppointmentService", () => {
         id: 1,
         userId: 1,
         barberId: 1,
-        datetime: new Date("2026-03-25T15:00:00"),
+        datetime: new Date("2026-03-25T16:00:00"),
         active: false,
       };
 
@@ -395,6 +428,82 @@ describe("AppointmentService", () => {
         await appointmentService.updateAppointment(updatedAppointment);
 
       expect(result.active).toBe(false);
+    });
+  });
+
+  describe("getPastAppointments", () => {
+    it("should return only past appointments", async () => {
+      // Current mocked time: 2026-03-24T12:00:00
+      // Appointment 4 is 2026-03-24T13:00:00 (in the future)
+      // All others are in the future (2026-03-25)
+      const result = await appointmentService.getPastAppointments();
+
+      expect(result).toBeDefined();
+      expect(result.data).toBeDefined();
+      expect(result.pagination).toBeDefined();
+      expect(result.data.length).toBe(0);
+    });
+
+    it("should include pagination information", async () => {
+      const result = await appointmentService.getPastAppointments({
+        limit: 5,
+        offset: 0,
+      });
+
+      expect(result.pagination.limit).toBe(5);
+      expect(result.pagination.offset).toBe(0);
+      expect(result.pagination.total).toBe(0);
+    });
+  });
+
+  describe("getUpcomingAppointments", () => {
+    it("should return only upcoming appointments", async () => {
+      // Current mocked time: 2026-03-24T12:00:00
+      const result = await appointmentService.getUpcomingAppointments();
+
+      expect(result).toBeDefined();
+      expect(result.data).toBeDefined();
+      expect(result.pagination).toBeDefined();
+      // Appointments 1, 2, 3, 4 are all after 12:00 on 2026-03-24 or later
+      expect(result.data.length).toBe(4);
+    });
+
+    it("should include all required fields in upcoming appointments", async () => {
+      const result = await appointmentService.getUpcomingAppointments();
+
+      result.data.forEach((apt) => {
+        expect(apt.id).toBeDefined();
+        expect(apt.userId).toBeDefined();
+        expect(apt.barberId).toBeDefined();
+        expect(apt.datetime).toBeDefined();
+        expect(apt.active).toBeDefined();
+      });
+    });
+
+    it("should include pagination information", async () => {
+      const result = await appointmentService.getUpcomingAppointments({
+        limit: 2,
+        offset: 0,
+      });
+
+      expect(result.pagination.limit).toBe(2);
+      expect(result.pagination.offset).toBe(0);
+      expect(result.pagination.total).toBe(4);
+      expect(result.data.length).toBe(2);
+    });
+
+    it("should respect pagination offset", async () => {
+      const resultPage1 = await appointmentService.getUpcomingAppointments({
+        limit: 2,
+        offset: 0,
+      });
+      const resultPage2 = await appointmentService.getUpcomingAppointments({
+        limit: 2,
+        offset: 2,
+      });
+
+      expect(resultPage1.data[0]!.id).not.toBe(resultPage2.data[0]!.id);
+      expect(resultPage2.data.length).toBe(2);
     });
   });
 
