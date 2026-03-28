@@ -9,6 +9,26 @@ import { handleValidationError } from "../utils/errorHandler";
 import { authMiddleware } from "../middleware/authMiddleware";
 import { UserRole } from "../user/user.model";
 
+const NODE_ENV = process.env.NODE_ENV || "development";
+
+// Secure cookie options
+const secureCookieOptions = {
+  httpOnly: true,
+  secure: false,
+  sameSite: "lax" as const,
+  path: "/",
+};
+
+const accessTokenCookieOptions = {
+  ...secureCookieOptions,
+  maxAge: 60 * 60 * 1000, // 1 hour
+};
+
+const refreshTokenCookieOptions = {
+  ...secureCookieOptions,
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+};
+
 export const authRouter = Router();
 
 // Login route
@@ -19,7 +39,19 @@ authRouter.post("/login", async (req: Request, res: Response) => {
       validatedData.email,
       validatedData.password,
     );
-    res.status(200).json(authResponse);
+
+    // Set tokens as secure HttpOnly cookies
+    res.cookie("accessToken", authResponse.token, accessTokenCookieOptions);
+    res.cookie(
+      "refreshToken",
+      authResponse.refreshToken,
+      refreshTokenCookieOptions,
+    );
+
+    res.status(200).json({
+      message: "Login successful",
+      user: authResponse.user,
+    });
   } catch (error) {
     if (handleValidationError(error, res)) return;
     if (
@@ -66,7 +98,18 @@ authRouter.post("/refresh", async (req: Request, res: Response) => {
     const response = await authService.refreshAccessToken(
       validatedData.refreshToken,
     );
-    res.status(200).json(response);
+
+    // Update cookies with new tokens
+    res.cookie("accessToken", response.token, accessTokenCookieOptions);
+    res.cookie(
+      "refreshToken",
+      response.refreshToken,
+      refreshTokenCookieOptions,
+    );
+
+    res.status(200).json({
+      message: "Token refreshed successfully",
+    });
   } catch (error) {
     if (handleValidationError(error, res)) return;
     if (
@@ -89,6 +132,11 @@ authRouter.post(
     try {
       const validatedData = validateRefreshToken(req.body);
       await authService.logout(validatedData.refreshToken);
+
+      // Clear cookies
+      res.clearCookie("accessToken");
+      res.clearCookie("refreshToken");
+
       res.status(200).json({ message: "Logged out successfully" });
     } catch (error) {
       if (handleValidationError(error, res)) return;
@@ -112,6 +160,11 @@ authRouter.post(
       }
 
       await authService.logoutAll(userId);
+
+      // Clear cookies
+      res.clearCookie("accessToken");
+      res.clearCookie("refreshToken");
+
       res
         .status(200)
         .json({ message: "Logged out from all sessions successfully" });

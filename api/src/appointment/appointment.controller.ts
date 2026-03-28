@@ -32,6 +32,7 @@ appointmentRouter.post("/", async (req: Request, res: Response) => {
       datetime: new Date(validatedData.datetime),
     } as Appointment);
     res.status(201).json(appointment);
+    console.log("novo apontamento!");
   } catch (error) {
     if (handleValidationError(error, res)) return;
 
@@ -114,65 +115,57 @@ appointmentRouter.get(
   },
 );
 
-appointmentRouter.use(adminMiddleware);
+// Get All Appointments (ADMIN ONLY)
+appointmentRouter.get(
+  "/",
+  adminMiddleware,
+  async (req: Request, res: Response) => {
+    try {
+      const { limit, offset } = parsePaginationParams(
+        req.query.limit,
+        req.query.offset,
+      );
+      const result = await appointmentService.getAllAppointmentsSorted({
+        limit,
+        offset,
+      });
+      res.status(200).json(result);
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+      res.status(500).json({ error: "Failed to get appointments" });
+    }
+  },
+);
 
-// Get Past Appointments
-appointmentRouter.get("/past", async (req: Request, res: Response) => {
-  try {
-    const { limit, offset } = parsePaginationParams(
-      req.query.limit,
-      req.query.offset,
-    );
-    const result = await appointmentService.getPastAppointments({
-      limit,
-      offset,
-    });
-    res.status(200).json(result);
-  } catch (error) {
-    console.error("Error fetching past appointments:", error);
-    res.status(500).json({ error: "Failed to get past appointments" });
-  }
-});
+// Get Appointment by ID (ADMIN ONLY)
+appointmentRouter.get(
+  "/:id",
+  adminMiddleware,
+  async (req: Request, res: Response) => {
+    try {
+      const id = parseIntParam(req.params.id);
+      const appointment = await appointmentService.getAppointmentById(id);
+      res.status(200).json(appointment);
+    } catch (error) {
+      if (handleNotFoundError(error, res, "Appointment")) return;
+      console.error("Error fetching appointment:", error);
+      res.status(500).json({ error: "Failed to get appointment" });
+    }
+  },
+);
 
-// Get Upcoming Appointments
-appointmentRouter.get("/upcoming", async (req: Request, res: Response) => {
-  try {
-    const { limit, offset } = parsePaginationParams(
-      req.query.limit,
-      req.query.offset,
-    );
-    const result = await appointmentService.getUpcomingAppointments({
-      limit,
-      offset,
-    });
-    res.status(200).json(result);
-  } catch (error) {
-    console.error("Error fetching upcoming appointments:", error);
-    res.status(500).json({ error: "Failed to get upcoming appointments" });
-  }
-});
-
-// Get Appointment by ID
-appointmentRouter.get("/:id", async (req: Request, res: Response) => {
-  try {
-    const id = parseIntParam(req.params.id);
-    const appointment = await appointmentService.getAppointmentById(id);
-    res.status(200).json(appointment);
-  } catch (error) {
-    if (handleNotFoundError(error, res, "Appointment")) return;
-    console.error("Error fetching appointment:", error);
-    res.status(500).json({ error: "Failed to get appointment" });
-  }
-});
-
-// Delete Appointment
-appointmentRouter.delete("/:id", async (req: Request, res: Response) => {
-  try {
-    const id = parseIntParam(req.params.id);
-    await appointmentService.deleteAppointmentById(id);
-    res.status(204).send();
-  } catch (error) {
-    console.error("Error deleting appointment:", error);
-    res.status(500).json({ error: "Failed to delete appointment" });
-  }
-});
+// Delete Appointment (ADMIN ONLY)
+appointmentRouter.delete(
+  "/:id",
+  adminMiddleware,
+  async (req: Request, res: Response) => {
+    try {
+      const id = parseIntParam(req.params.id);
+      await appointmentService.deleteAppointmentById(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting appointment:", error);
+      res.status(500).json({ error: "Failed to delete appointment" });
+    }
+  },
+);

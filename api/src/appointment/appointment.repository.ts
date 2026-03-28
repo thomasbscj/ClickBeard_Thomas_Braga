@@ -53,13 +53,19 @@ class AppointmentRepository implements IAppointmentRepository {
   async getAllAppointments(
     pagination?: PaginationParams,
   ): Promise<PaginatedResponse<Appointment>> {
-    const limit = pagination?.limit || 10;
+    const limit = pagination?.limit || 100;
     const offset = pagination?.offset || 0;
 
     const [appointments, total] = await Promise.all([
       db.appointment.findMany({
+        where: {
+          active: true,
+        },
         skip: offset,
         take: limit,
+        orderBy: {
+          datetime: "desc",
+        },
       }),
       db.appointment.count(),
     ]);
@@ -91,6 +97,7 @@ class AppointmentRepository implements IAppointmentRepository {
       db.appointment.findMany({
         where: {
           userId: userId,
+          active: true
         },
         skip: offset,
         take: limit,
@@ -98,6 +105,7 @@ class AppointmentRepository implements IAppointmentRepository {
       db.appointment.count({
         where: {
           userId: userId,
+          active: true
         },
       }),
     ]);

@@ -56,13 +56,16 @@ export class AppointmentService implements IAppointmentService {
   }
 
   private isWithinBusinessHours(datetime: Date): boolean {
-    // Validate against UTC time (11:00-21:00 UTC)
-    // Using getUTCHours() to get the hour in UTC timezone
-    const hour = datetime.getUTCHours()
-    const minutes = datetime.getMinutes()
-    const notBefore = hour > this.OPENING_HOUR
-    const notAfter = hour < this.CLOSING_HOUR
-    return notBefore && notAfter;
+    // Business hours in São Paulo (UTC-3): 8:00-17:30
+    // Converted to UTC: 11:00-20:30
+    const hour = datetime.getUTCHours();
+    const minutes = datetime.getUTCMinutes();
+    console.log(hour, minutes)
+    // Allow 11:00-20:29 UTC (8:00-17:29 UTC-3)
+    const isAtOrAfter11 = hour >= 11;
+    const isBeforeOrAt20_30 = hour < 20 || (hour === 20 && minutes <= 30);
+
+    return isAtOrAfter11 && isBeforeOrAt20_30;
   }
 
   private async isBarberAvailable(
@@ -91,7 +94,7 @@ export class AppointmentService implements IAppointmentService {
   ): Promise<void> {
     if (!this.isWithinBusinessHours(appointmentDateTime)) {
       throw new Error(
-        `Appointments must be scheduled between ${this.OPENING_HOUR-3}:00 and ${this.CLOSING_HOUR-3}:00`,
+        `Appointments must be scheduled between 8:00 and 17:30 (São Paulo time)`,
       );
     }
     const endTime = new Date(
@@ -208,6 +211,30 @@ export class AppointmentService implements IAppointmentService {
     };
   }
 
+  async getAllAppointmentsSorted(
+    pagination?: PaginationParams,
+  ): Promise<PaginatedResponse<Appointment>> {
+    const allAppointments =
+      await this.appointmentRepository.getAllAppointments();
+
+    // Sort by datetime in descending order (newest first)
+    const sortedAppointments = [...allAppointments.data].sort(
+      (a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime(),
+    );
+
+    const limit = pagination?.limit || 10;
+    const offset = pagination?.offset || 0;
+
+    return {
+      data: sortedAppointments.slice(offset, offset + limit),
+      pagination: {
+        limit,
+        offset,
+        total: sortedAppointments.length,
+      },
+    };
+  }
+
   async updateAppointment(appointment: Appointment): Promise<Appointment> {
     let appointmentDateTime = new Date(appointment.datetime);
 
@@ -245,7 +272,7 @@ export class AppointmentService implements IAppointmentService {
     const appointmentTime = appointment.datetime;
     const hoursUntilAppointment =
       (appointmentTime.getTime() - now.getTime()) / (1000 * 60 * 60);
-      console.log(hoursUntilAppointment)
+    console.log(hoursUntilAppointment);
 
     if (hoursUntilAppointment < this.CANCELLATION_NOTICE_HOURS) {
       throw new Error(
