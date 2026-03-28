@@ -5,6 +5,8 @@ import { userRepository } from "../user/user.repository";
 import { refreshTokenRepository } from "./refreshToken.repository";
 import { randomBytes } from "crypto";
 
+const saltRounds = 13;
+
 interface JWTPayload {
   id: number;
   role: UserRole;
@@ -58,7 +60,6 @@ export class AuthService {
   }
 
   private async hashPassword(password: string): Promise<string> {
-    const saltRounds = 10;
     return bcrypt.hash(password, saltRounds);
   }
 

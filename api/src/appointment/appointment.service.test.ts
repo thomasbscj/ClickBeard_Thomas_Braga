@@ -240,7 +240,7 @@ describe("AppointmentService", () => {
       expect(result.datetime.getHours()).toBe(15);
     });
 
-    it("should validate business hours (11:00-21:00)", async () => {
+    it("should validate business hours (8:00-17:30)", async () => {
       const appointmentInput: Appointment = {
         id: 0,
         userId: 1,
@@ -252,7 +252,7 @@ describe("AppointmentService", () => {
       await expect(
         appointmentService.createAppointment(appointmentInput),
       ).rejects.toThrow(
-        "Appointments must be scheduled between 11:00 and 21:00",
+        "Appointments must be scheduled between 8:00 and 17:30 (São Paulo time)",
       );
     });
 
@@ -268,7 +268,7 @@ describe("AppointmentService", () => {
       await expect(
         appointmentService.createAppointment(appointmentInput),
       ).rejects.toThrow(
-        "Appointments must be scheduled between 11:00 and 21:00",
+        "Appointments must be scheduled between 8:00 and 17:30 (São Paulo time)",
       );
     });
 
@@ -406,7 +406,7 @@ describe("AppointmentService", () => {
       await expect(
         appointmentService.updateAppointment(updatedAppointment),
       ).rejects.toThrow(
-        "Appointments must be scheduled between 11:00 and 21:00",
+        "Appointments must be scheduled between 8:00 and 17:30 (São Paulo time)",
       );
     });
 

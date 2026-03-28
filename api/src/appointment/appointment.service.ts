@@ -28,8 +28,8 @@ interface IAppointmentService {
 }
 
 export class AppointmentService implements IAppointmentService {
-  private readonly OPENING_HOUR = 11;
-  private readonly CLOSING_HOUR = 21;
+  private readonly OPENING_HOUR = 8;
+  private readonly CLOSING_HOUR = 18;
   private readonly APPOINTMENT_DURATION = 30;
   private readonly CANCELLATION_NOTICE_HOURS = 2;
 

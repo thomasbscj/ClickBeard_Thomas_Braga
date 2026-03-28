@@ -3,7 +3,7 @@ import { User, UserSecure } from "./user.model";
 import { id, PaginationParams, PaginatedResponse } from "../types/types";
 import { userRepository } from "./user.repository";
 import type { IUserRepository } from "./user.repository";
-
+const SALT_ROUNDS = 13;
 interface IUserService {
   createUser(user: User): Promise<UserSecure>;
   getUserById(id: id): Promise<UserSecure>;
@@ -18,8 +18,7 @@ export class UserService implements IUserService {
   constructor(private userRepository: IUserRepository) {}
 
   private async hashPassword(password: string): Promise<string> {
-    const saltRounds = 10;
-    return bcrypt.hash(password, saltRounds);
+    return bcrypt.hash(password, SALT_ROUNDS);
   }
 
   private removePassword(user: User): UserSecure {
