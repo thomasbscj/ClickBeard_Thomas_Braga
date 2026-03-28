@@ -9,8 +9,6 @@ import { handleValidationError } from "../utils/errorHandler";
 import { authMiddleware } from "../middleware/authMiddleware";
 import { UserRole } from "../user/user.model";
 
-const NODE_ENV = process.env.NODE_ENV || "development";
-
 const secureCookieOptions = {
   httpOnly: true,
   secure: false,

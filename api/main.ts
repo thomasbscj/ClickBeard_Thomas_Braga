@@ -9,7 +9,6 @@ import { authRouter } from "./src/auth/auth.controller";
 import { authMiddleware } from "./src/middleware/authMiddleware";
 
 const PORT = Number(process.env.PORT) || 8080;
-const NODE_ENV = process.env.NODE_ENV || "development";
 const FRONTEND_URL = process.env.FRONTEND_URL;
 const HOST = process.env.MY_IP;
 const app = Express();

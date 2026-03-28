@@ -2,7 +2,8 @@
   "type": "commonjs",
   "scripts": {
     "build": "npx tsc",
-    "start": "node --env-file=.env ./dist/main.js",
+    "start": "node --env-file=example.env ./dist/main.js",
+    "start:other-env": "node --env-file=.env ./dist/main.js",
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage"
