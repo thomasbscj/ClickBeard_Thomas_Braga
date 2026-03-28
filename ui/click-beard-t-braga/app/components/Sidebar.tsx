@@ -2,19 +2,14 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useState } from "react";
 
 export default function Sidebar() {
   const router = useRouter();
-  const isAdmin = document.cookie.includes("admin");
-
-  useEffect(() => {
-    // Force component to stay visible
-    const sidebar = document.querySelector("aside");
-    if (sidebar) {
-      sidebar.style.display = "flex";
-    }
-  }, []);
+  const [isAdmin] = useState(() => {
+  if (typeof document === "undefined") return false;
+  return document.cookie.includes("admin");
+});
 
   const handleLogout = () => {
     router.push("/logout");
