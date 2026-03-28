@@ -14,7 +14,6 @@ function decodeJWT(token: string): { role?: string } | null {
     const padded = payload + "=".repeat((4 - (payload.length % 4)) % 4);
     const decoded = atob(padded);
     const parsed = JSON.parse(decoded);
-    console.log(parsed);
     return parsed;
   } catch (error) {
     console.error("Error decoding JWT:", error);
@@ -26,7 +25,6 @@ export function proxy(req: NextRequest) {
   const token = req.cookies.get("accessToken");
   const pathname = req.nextUrl.pathname;
   const publicRoutes = ["/login", "/register"];
-  console.log("passou pelo proxy!");
 
   // Create response object
   const response = NextResponse.next();

@@ -16,7 +16,7 @@ const app = Express();
 
 // Security middleware
 const corsOptions = {
-  origin: "http://192.168.15.7:3000", //FRONTEND_URL,
+  origin: FRONTEND_URL,
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"],
@@ -24,11 +24,6 @@ const corsOptions = {
   exposedHeaders: ["Set-Cookie"],
 };
 
-console.log("Accepting requests from: " + FRONTEND_URL);
-app.use((res, req, next) => {
-  console.log("received a call");
-  next();
-});
 // Middleware
 app.use(cors(corsOptions));
 app.use(Express.json({ limit: "10kb" })); // Limit payload size

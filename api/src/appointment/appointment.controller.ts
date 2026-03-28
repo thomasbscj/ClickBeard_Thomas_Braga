@@ -32,7 +32,6 @@ appointmentRouter.post("/", async (req: Request, res: Response) => {
       datetime: new Date(validatedData.datetime),
     } as Appointment);
     res.status(201).json(appointment);
-    console.log("novo apontamento!");
   } catch (error) {
     if (handleValidationError(error, res)) return;
 

@@ -15,8 +15,7 @@ export async function GET() {
     await refreshAccessToken(refreshToken)
         .then(() => {
                 redirect("/");
-        }).catch((e)=>{
-                console.log(e)
+        }).catch(() =>{
                 redirect("/login");
         });
 

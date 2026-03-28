@@ -60,7 +60,6 @@ export class AppointmentService implements IAppointmentService {
     // Converted to UTC: 11:00-20:30
     const hour = datetime.getUTCHours();
     const minutes = datetime.getUTCMinutes();
-    console.log(hour, minutes)
     // Allow 11:00-20:29 UTC (8:00-17:29 UTC-3)
     const isAtOrAfter11 = hour >= 11;
     const isBeforeOrAt20_30 = hour < 20 || (hour === 20 && minutes <= 30);
@@ -272,7 +271,6 @@ export class AppointmentService implements IAppointmentService {
     const appointmentTime = appointment.datetime;
     const hoursUntilAppointment =
       (appointmentTime.getTime() - now.getTime()) / (1000 * 60 * 60);
-    console.log(hoursUntilAppointment);
 
     if (hoursUntilAppointment < this.CANCELLATION_NOTICE_HOURS) {
       throw new Error(
