@@ -51,7 +51,7 @@ export default function MyAppointmentsPage() {
                 ...apt,
                 barberName: barberData.name,
               };
-            } catch (err) {
+            } catch {
               return {
                 ...apt,
                 barberName: "Barbeiro desconhecido",

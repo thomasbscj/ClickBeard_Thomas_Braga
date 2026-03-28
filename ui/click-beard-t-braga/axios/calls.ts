@@ -1,6 +1,4 @@
 import axios, { AxiosInstance } from "axios";
-import { config } from "process";
-
 /**
  * API Calls Module using Axios
  *
@@ -253,7 +251,7 @@ export async function getAllBarbers(limit = 10, offset = 0) {
  */
 export async function createBarber(data: {
   name: string;
-  bornAt: string;
+  bornAt: number;
   hiredAt: string;
   specialties: string[];
 }) {

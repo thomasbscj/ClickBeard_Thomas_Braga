@@ -7,20 +7,31 @@ import { getAllBarbers, getAllSpecialties, createAppointment } from "@/axios";
 interface Barber {
   id: number;
   name: string;
-  specialties?: string[];
+  bornAt: number;
+  hiredAt: string;
+  specialties: string[];
+  busyTimes?: BusyTime[];
+}
+
+interface BusyTime {
+  start: string;
+  end: string;
 }
 
 interface Specialty {
   name: string;
-  description: string;
+  description?: string;
 }
 
-interface BarberWithSpecialties extends Barber {
-  BarberSpecialty: Array<{ specialtyName: string }>;
+interface FormDataState {
+  barberId: string;
+  specialtyId: string;
+  appointmentDate: string;
+  appointmentTime: string;
 }
 
 export default function AppointmentsPage() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormDataState>({
     barberId: "",
     specialtyId: "",
     appointmentDate: "",
@@ -100,23 +111,25 @@ export default function AppointmentsPage() {
   const fetchBarberBusyTimes = async (
     barberId: number,
     appointmentDate: string,
-  ) => {
+  ): Promise<void> => {
     try {
       const response = await getAllBarbers(100, 0);
-      const selectedBarber = response.data?.find((b: any) => b.id === barberId);
+      const selectedBarber = response.data?.find(
+        (b: Barber) => b.id === barberId,
+      );
 
-      if (selectedBarber?.busyTimes) {
+      if (selectedBarber?.busyTimes && selectedBarber.busyTimes.length > 0) {
         // Filter busy times for the selected date
         const selectedDate =
           appointmentDate || new Date().toISOString().split("T")[0];
 
         const busyTimesForDate = selectedBarber.busyTimes
-          .filter((bt: any) => {
+          .filter((bt: BusyTime) => {
             // Extract date part only (YYYY-MM-DD) in UTC
             const busyDate = new Date(bt.start).toISOString().split("T")[0];
             return busyDate === selectedDate;
           })
-          .map((bt: any) => {
+          .map((bt: BusyTime) => {
             // Convert UTC time back to local time by subtracting 3 hours
             const utcStartTime = new Date(bt.start);
             const hours = utcStartTime.getUTCHours();
@@ -138,12 +151,13 @@ export default function AppointmentsPage() {
 
   const filteredBarbers = formData.specialtyId
     ? barbers.filter((barber) => {
-        const barberData = barber as any;
-        return barberData.specialties?.includes(formData.specialtyId);
+        return barber.specialties?.includes(formData.specialtyId);
       })
     : [];
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
     e.preventDefault();
     setIsSubmitting(true);
     setSuccessMessage("");
