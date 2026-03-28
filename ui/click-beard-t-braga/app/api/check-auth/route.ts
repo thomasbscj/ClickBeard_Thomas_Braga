@@ -6,8 +6,6 @@ export async function GET() {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("jwt")?.value;
     const refreshToken = cookieStore.get("refreshToken")?.value;
-
-    // If both tokens exist, user is authenticated
     if (accessToken || refreshToken) {
       return NextResponse.json({ authenticated: true }, { status: 200 });
     }

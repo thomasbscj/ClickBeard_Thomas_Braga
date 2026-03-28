@@ -25,7 +25,6 @@ export default function Home() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        // Fetch data with limit 1 and offset 0 to get just the count
         const [appointmentsData, barbersData, specialtiesData] =
           await Promise.all([
             getMyAppointments(1, 0),
@@ -52,7 +51,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-950">
-      {/* Header */}
       <header className="bg-gray-900 border-b border-red-700/30 shadow-md ml-64">
         <div className="px-10 py-8">
           <h1 className="text-4xl font-bold text-white">
@@ -61,13 +59,9 @@ export default function Home() {
           <p className="text-gray-300 mt-2">Sistema de Agendamento Premium</p>
         </div>
       </header>
-
-      {/* Main Content */}
       <main className="ml-64 py-16 px-8">
         <div className="w-full max-w-6xl space-y-24">
-          {/* Dashboard Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-            {/* Card 1 - Upcoming Appointments */}
             <div className="bg-gray-900 rounded-xl shadow-lg p-10 border border-gray-800">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold text-gray-300">
@@ -85,8 +79,6 @@ export default function Home() {
                     } programado${stats.upcomingAppointments !== 1 ? "s" : ""}`}
               </p>
             </div>
-
-            {/* Card 2 - Barbers */}
             <div className="bg-gray-900 rounded-xl shadow-lg p-10 border border-gray-800">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold text-gray-300">
@@ -104,8 +96,6 @@ export default function Home() {
                     } disponív${stats.barbers !== 1 ? "eis" : "el"}`}
               </p>
             </div>
-
-            {/* Card 3 - Specialties */}
             <div className="bg-gray-900 rounded-xl shadow-lg p-10 border border-gray-800">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold text-gray-300">
@@ -124,8 +114,6 @@ export default function Home() {
               </p>
             </div>
           </div>
-
-          {/* Welcome Section */}
           <div className="bg-linear-to-r from-gray-900 to-gray-800 rounded-xl shadow-lg p-12 border border-gray-800">
             <h2 className="text-2xl font-bold mb-6 text-white">Bem-vindo!</h2>
 

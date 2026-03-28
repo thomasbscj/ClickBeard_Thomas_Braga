@@ -78,7 +78,6 @@ export default function UsersPage() {
 
   return (
     <div className="min-h-screen bg-gray-950">
-      {/* Header */}
       <header className="bg-gray-900 border-b border-red-700/30 shadow-md ml-64">
         <div className="px-10 py-8 flex justify-between items-center">
           <div>
@@ -97,13 +96,9 @@ export default function UsersPage() {
           </Link>
         </div>
       </header>
-
-      {/* Main Content */}
       <main className="ml-64 py-16 px-8">
         <div className="w-full max-w-7xl">
-          {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            {/* Total Users */}
             <div className="bg-linear-to-br from-blue-900/30 to-blue-800/10 rounded-xl shadow-lg p-6 border border-blue-500/30">
               <p className="text-gray-400 text-sm font-medium mb-2">
                 Total de Usuários
@@ -112,8 +107,6 @@ export default function UsersPage() {
                 {data.isLoading ? "..." : data.totalUsers}
               </p>
             </div>
-
-            {/* Admins Count */}
             <div className="bg-linear-to-br from-red-900/30 to-red-800/10 rounded-xl shadow-lg p-6 border border-red-500/30">
               <p className="text-gray-400 text-sm font-medium mb-2">
                 Administradores
@@ -124,8 +117,6 @@ export default function UsersPage() {
                   : data.users.filter((u) => u.Role === "admin").length}
               </p>
             </div>
-
-            {/* Regular Users Count */}
             <div className="bg-linear-to-br from-green-900/30 to-green-800/10 rounded-xl shadow-lg p-6 border border-green-500/30">
               <p className="text-gray-400 text-sm font-medium mb-2">
                 Usuários Comuns
@@ -137,8 +128,6 @@ export default function UsersPage() {
               </p>
             </div>
           </div>
-
-          {/* Users Table */}
           <div className="bg-gray-900 rounded-xl shadow-lg border border-gray-800 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -225,8 +214,6 @@ export default function UsersPage() {
               </table>
             </div>
           </div>
-
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="mt-8 flex justify-center items-center gap-4">
               <button

@@ -67,7 +67,6 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-gray-950">
-      {/* Header */}
       <header className="bg-gray-900 border-b border-red-700/30 shadow-md ml-64">
         <div className="px-10 py-8 flex justify-between items-center">
           <div>
@@ -87,16 +86,13 @@ export default function AdminPage() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="ml-64 py-16 px-8">
         <div className="w-full max-w-7xl">
-          {/* Dashboard Stats Section */}
           <div className="mb-16">
             <h2 className="text-2xl font-bold text-white mb-8">
               Estatísticas do Sistema
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* Total Barbers Card */}
               <div className="bg-linear-to-br from-blue-900/30 to-blue-800/10 rounded-xl shadow-lg p-8 border border-blue-500/30 hover:border-blue-400/60 transition-all">
                 <div className="flex items-start justify-between">
                   <div>
@@ -119,8 +115,6 @@ export default function AdminPage() {
                   Profissionais ativos no sistema
                 </p>
               </div>
-
-              {/* Total Specialties Card */}
               <div className="bg-linear-to-br from-purple-900/30 to-purple-800/10 rounded-xl shadow-lg p-8 border border-purple-500/30 hover:border-purple-400/60 transition-all">
                 <div className="flex items-start justify-between">
                   <div>
@@ -143,8 +137,6 @@ export default function AdminPage() {
                   Serviços disponíveis
                 </p>
               </div>
-
-              {/* Upcoming Appointments Card */}
               <div className="bg-linear-to-br from-green-900/30 to-green-800/10 rounded-xl shadow-lg p-8 border border-green-500/30 hover:border-green-400/60 transition-all">
                 <div className="flex items-start justify-between">
                   <div>
@@ -167,8 +159,6 @@ export default function AdminPage() {
                   Agendamentos futuros
                 </p>
               </div>
-
-              {/* Past Appointments Card */}
               <div className="bg-linear-to-br from-orange-900/30 to-orange-800/10 rounded-xl shadow-lg p-8 border border-orange-500/30 hover:border-orange-400/60 transition-all">
                 <div className="flex items-start justify-between">
                   <div>
@@ -191,8 +181,6 @@ export default function AdminPage() {
                   Histórico de agendamentos
                 </p>
               </div>
-
-              {/* Total Users Card */}
               <div className="bg-linear-to-br from-red-900/30 to-red-800/10 rounded-xl shadow-lg p-8 border border-red-500/30 hover:border-red-400/60 transition-all">
                 <div className="flex items-start justify-between">
                   <div>
@@ -217,17 +205,12 @@ export default function AdminPage() {
               </div>
             </div>
           </div>
-
-          {/* Divider */}
           <div className="border-t border-gray-800 mb-12"></div>
-
-          {/* Management Cards Section */}
           <div>
             <h2 className="text-2xl font-bold text-white mb-8">
               Gerenciamento
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Barbeiros Card */}
               <Link href="/admin/barbers">
                 <div className="bg-gray-900 rounded-xl shadow-lg p-8 border border-gray-800 hover:border-blue-500/50 hover:shadow-xl transition-all cursor-pointer">
                   <div className="flex items-center gap-4 mb-4">
@@ -251,8 +234,6 @@ export default function AdminPage() {
                   </p>
                 </div>
               </Link>
-
-              {/* Especialidades Card */}
               <Link href="/admin/specialties">
                 <div className="bg-gray-900 rounded-xl shadow-lg p-8 border border-gray-800 hover:border-purple-500/50 hover:shadow-xl transition-all cursor-pointer">
                   <div className="flex items-center gap-4 mb-4">
@@ -278,8 +259,6 @@ export default function AdminPage() {
                   </p>
                 </div>
               </Link>
-
-              {/* Agendamentos Card */}
               <Link href="/admin/appointments">
                 <div className="bg-gray-900 rounded-xl shadow-lg p-8 border border-gray-800 hover:border-green-500/50 hover:shadow-xl transition-all cursor-pointer">
                   <div className="flex items-center gap-4 mb-4">
@@ -305,8 +284,6 @@ export default function AdminPage() {
                   </p>
                 </div>
               </Link>
-
-              {/* Usuários Card */}
               <Link href="/admin/users">
                 <div className="bg-gray-900 rounded-xl shadow-lg p-8 border border-gray-800 hover:border-red-500/50 hover:shadow-xl transition-all cursor-pointer">
                   <div className="flex items-center gap-4 mb-4">

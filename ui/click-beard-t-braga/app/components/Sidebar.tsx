@@ -17,7 +17,6 @@ export default function Sidebar() {
 
   return (
     <aside className="w-64 bg-linear-to-b from-gray-950 via-gray-900 to-gray-950 text-white transition-all duration-300 ease-in-out flex flex-col shadow-2xl border-r border-red-700/30">
-      {/* Header / Logo Section */}
       <Link
         href="/"
         className="p-6 border-b border-red-700/30 flex items-center justify-between hover:bg-gray-800/50 transition-colors"
@@ -30,7 +29,6 @@ export default function Sidebar() {
         </div>
       </Link>
 
-      {/* New Appointment Button */}
       <div className="px-3 py-4 border-b border-red-700/30">
         <a
           href="/appointments"
@@ -53,7 +51,6 @@ export default function Sidebar() {
         </a>
       </div>
 
-      {/* My Appointments Button */}
       <div className="px-3 py-2 border-b border-red-700/30">
         <a
           href="/appointments/my"
@@ -76,7 +73,6 @@ export default function Sidebar() {
         </a>
       </div>
 
-      {/* Admin Panel Button - Only visible for admins */}
       {isAdmin && (
         <div className="px-3 py-2 border-b border-red-700/30">
           <a
@@ -102,7 +98,6 @@ export default function Sidebar() {
       )}
       <div className="flex-1"></div>
 
-      {/* Logout Button */}
       <div className="px-3 py-4 border-t border-red-700/30">
         <button
           onClick={handleLogout}

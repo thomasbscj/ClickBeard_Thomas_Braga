@@ -41,8 +41,6 @@ export default function MyAppointmentsPage() {
       try {
         setIsLoading(true);
         const response: PaginatedResponse = await getMyAppointments(100, 0);
-
-        // Fetch barber names for each appointment
         const appointmentsWithBarberNames = await Promise.all(
           response.data.map(async (apt) => {
             try {
@@ -59,14 +57,10 @@ export default function MyAppointmentsPage() {
             }
           }),
         );
-
-        // Sort by datetime in ascending order (oldest first)
         const sortedAppointments = appointmentsWithBarberNames.sort(
           (a, b) =>
             new Date(a.datetime).getTime() - new Date(b.datetime).getTime(),
         );
-
-        // Filter only upcoming appointments (future dates)
         const upcomingAppointments = sortedAppointments.filter((apt) =>
           isUpcoming(apt.datetime),
         );
@@ -127,19 +121,13 @@ export default function MyAppointmentsPage() {
   const canCancel = (datetime: string) => {
     const appointmentDate = new Date(datetime);
     const today = new Date();
-
-    // Check if appointment is today
     const isToday =
       appointmentDate.getDate() === today.getDate() &&
       appointmentDate.getMonth() === today.getMonth() &&
       appointmentDate.getFullYear() === today.getFullYear();
-
-    // Only check 2-hour rule if appointment is today
     if (!isToday) {
       return true;
     }
-
-    // If it's today, check if there are 2 hours or more until appointment
     const appointmentTime = appointmentDate.getTime();
     const now = new Date().getTime();
     const hoursUntilAppointment = (appointmentTime - now) / (1000 * 60 * 60);
@@ -148,7 +136,6 @@ export default function MyAppointmentsPage() {
 
   return (
     <div className="min-h-screen bg-gray-950">
-      {/* Header */}
       <header className="bg-gray-900 border-b border-red-700/30 shadow-md ml-64">
         <div className="px-10 py-8">
           <h1 className="text-4xl font-bold text-white">Meus Agendamentos</h1>
@@ -157,25 +144,18 @@ export default function MyAppointmentsPage() {
           </p>
         </div>
       </header>
-
-      {/* Main Content */}
       <main className="ml-64 py-16 px-8">
         <div className="w-full max-w-4xl">
-          {/* Success Message */}
           {successMessage && (
             <div className="mb-6 p-4 bg-green-500/20 border border-green-500/50 rounded-lg">
               <p className="text-green-400 font-semibold">{successMessage}</p>
             </div>
           )}
-
-          {/* Error Message */}
           {error && (
             <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg">
               <p className="text-red-400 font-semibold">{error}</p>
             </div>
           )}
-
-          {/* Loading State */}
           {isLoading && (
             <div className="text-center py-16">
               <div className="inline-block">
@@ -184,8 +164,6 @@ export default function MyAppointmentsPage() {
               <p className="text-gray-400 mt-4">Carregando agendamentos...</p>
             </div>
           )}
-
-          {/* Empty State */}
           {!isLoading && appointments.length === 0 && (
             <div className="text-center py-16">
               <svg
@@ -212,8 +190,6 @@ export default function MyAppointmentsPage() {
               </Link>
             </div>
           )}
-
-          {/* Appointments List */}
           {!isLoading && appointments.length > 0 && (
             <div className="space-y-6">
               {appointments.map((appointment) => {
@@ -230,9 +206,7 @@ export default function MyAppointmentsPage() {
                     }`}
                   >
                     <div className="flex items-start justify-between gap-6">
-                      {/* Info Section */}
                       <div className="flex-1 space-y-4">
-                        {/* Status Badge */}
                         {upcoming && (
                           <div className="inline-block">
                             <span className="px-3 py-1 bg-blue-500/20 border border-blue-500/50 text-blue-400 text-xs font-semibold rounded-full">
@@ -240,16 +214,12 @@ export default function MyAppointmentsPage() {
                             </span>
                           </div>
                         )}
-
-                        {/* Barber Name */}
                         <div>
                           <p className="text-sm text-gray-400 mb-1">Barbeiro</p>
                           <p className="text-xl font-semibold text-white">
                             {appointment.barberName}
                           </p>
                         </div>
-
-                        {/* Date and Time */}
                         <div className="grid grid-cols-2 gap-4 pt-2">
                           <div>
                             <p className="text-sm text-gray-400 mb-1">Data</p>
@@ -261,8 +231,6 @@ export default function MyAppointmentsPage() {
                           </div>
                         </div>
                       </div>
-
-                      {/* Cancel Button */}
                       {upcoming && (
                         <button
                           onClick={() => handleCancel(appointment.id)}

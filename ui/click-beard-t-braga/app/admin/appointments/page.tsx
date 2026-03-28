@@ -100,7 +100,6 @@ export default function AppointmentsPage() {
 
   return (
     <div className="min-h-screen bg-gray-950">
-      {/* Header */}
       <header className="bg-gray-900 border-b border-red-700/30 shadow-md ml-64">
         <div className="px-10 py-8">
           <Link
@@ -115,18 +114,13 @@ export default function AppointmentsPage() {
           </p>
         </div>
       </header>
-
-      {/* Main Content */}
       <main className="ml-64 py-16 px-8">
         <div className="w-full max-w-6xl">
-          {/* Error Message */}
           {error && (
             <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg">
               <p className="text-red-400 font-semibold">{error}</p>
             </div>
           )}
-
-          {/* Tabs */}
           <div className="flex gap-4 mb-8 border-b border-gray-800">
             <button
               onClick={() => setActiveTab("past")}
@@ -159,8 +153,6 @@ export default function AppointmentsPage() {
               Futuros ({appointments.upcoming.length})
             </button>
           </div>
-
-          {/* Loading */}
           {isLoading && (
             <div className="text-center py-16">
               <div className="inline-block">
@@ -169,8 +161,6 @@ export default function AppointmentsPage() {
               <p className="text-gray-400 mt-4">Carregando agendamentos...</p>
             </div>
           )}
-
-          {/* Appointments List */}
           {!isLoading && currentAppointments.length > 0 && (
             <div className="space-y-4">
               {currentAppointments.map((apt) => {

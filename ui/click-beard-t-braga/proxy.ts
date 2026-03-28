@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-/**
- * Decode JWT payload from token string
- */
 function decodeJWT(token: string): { role?: string } | null {
   try {
     const parts = token.split(".");
@@ -25,25 +22,20 @@ export function proxy(req: NextRequest) {
   const token = req.cookies.get("accessToken");
   const pathname = req.nextUrl.pathname;
   const publicRoutes = ["/login", "/register"];
-
-  // Create response object
   const response = NextResponse.next();
 
-  // Check if user has token and extract role
   if (token?.value) {
     const payload = decodeJWT(token.value);
     if (payload?.role === "admin") {
-      // Set non-httpOnly cookie with role
       response.cookies.set("role", "admin", {
         httpOnly: false,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        maxAge: 60 * 60 * 24, // 24 hours
+        maxAge: 60 * 60 * 24,
       });
     }
   }
 
-  // Check if trying to access admin routes
   if (pathname.startsWith("/admin")) {
     if (!token?.value) {
       return NextResponse.redirect(new URL("/", req.url));
@@ -57,7 +49,6 @@ export function proxy(req: NextRequest) {
     return response;
   }
 
-  // Regular authentication check for protected routes
   if (!token?.value && !publicRoutes.includes(pathname)) {
     return NextResponse.redirect(new URL("/login", req.url));
   }

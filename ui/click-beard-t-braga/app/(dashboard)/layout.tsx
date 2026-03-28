@@ -30,10 +30,7 @@ export default function DashboardLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-row bg-gray-950">
-        {/* Sidebar Navigation */}
         <Sidebar key="sidebar" />
-
-        {/* Main Content */}
         <main className="flex-1 overflow-auto">{children}</main>
       </body>
     </html>

@@ -67,7 +67,7 @@ export default function BarbersPage() {
       ) {
         await createBarber({
           name: formData.name,
-          bornAt: parseInt(formData.bornAt.split("-")[0]), // Extract year from date
+          bornAt: parseInt(formData.bornAt.split("-")[0]),
           hiredAt: new Date(formData.hiredAt).toISOString(),
           specialties: formData.specialties,
         });
@@ -115,7 +115,6 @@ export default function BarbersPage() {
 
   return (
     <div className="min-h-screen bg-gray-950">
-      {/* Header */}
       <header className="bg-gray-900 border-b border-red-700/30 shadow-md ml-64">
         <div className="px-10 py-8 flex justify-between items-center">
           <div>
@@ -137,25 +136,18 @@ export default function BarbersPage() {
           </button>
         </div>
       </header>
-
-      {/* Main Content */}
       <main className="ml-64 py-16 px-8">
         <div className="w-full max-w-6xl">
-          {/* Success Message */}
           {successMessage && (
             <div className="mb-6 p-4 bg-green-500/20 border border-green-500/50 rounded-lg">
               <p className="text-green-400 font-semibold">{successMessage}</p>
             </div>
           )}
-
-          {/* Error Message */}
           {error && (
             <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg">
               <p className="text-red-400 font-semibold">{error}</p>
             </div>
           )}
-
-          {/* Form */}
           {showForm && (
             <div className="bg-gray-900 rounded-xl shadow-lg p-8 border border-gray-800 mb-8">
               <h2 className="text-2xl font-bold text-white mb-6">
@@ -239,8 +231,6 @@ export default function BarbersPage() {
               </form>
             </div>
           )}
-
-          {/* Loading */}
           {isLoading && (
             <div className="text-center py-16">
               <div className="inline-block">
@@ -249,8 +239,6 @@ export default function BarbersPage() {
               <p className="text-gray-400 mt-4">Carregando barbeiros...</p>
             </div>
           )}
-
-          {/* Barbers List */}
           {!isLoading && barbers.length > 0 && (
             <div className="space-y-4">
               {barbers.map((barber) => (

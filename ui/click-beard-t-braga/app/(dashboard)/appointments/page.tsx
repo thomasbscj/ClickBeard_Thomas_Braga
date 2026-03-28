@@ -48,10 +48,8 @@ export default function AppointmentsPage() {
 
   const generateAvailableTimes = () => {
     const times = [];
-    // Generate times from 8:00 to 17:30 (local time UTC-3)
     for (let hour = 8; hour <= 17; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
-        // Stop at 17:30
         if (hour === 17 && minute > 30) break;
         const timeString = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
         times.push(timeString);
@@ -94,15 +92,13 @@ export default function AppointmentsPage() {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-      ...(name === "specialtyId" && { barberId: "" }), // Reset barberId when specialty changes
+      ...(name === "specialtyId" && { barberId: "" }), 
     }));
 
-    // Fetch barber's busy times when barber is selected
     if (name === "barberId" && value) {
       fetchBarberBusyTimes(parseInt(value), formData.appointmentDate);
     }
 
-    // Fetch barber's busy times when date changes
     if (name === "appointmentDate" && value && formData.barberId) {
       fetchBarberBusyTimes(parseInt(formData.barberId), value);
     }
@@ -119,18 +115,15 @@ export default function AppointmentsPage() {
       );
 
       if (selectedBarber?.busyTimes && selectedBarber.busyTimes.length > 0) {
-        // Filter busy times for the selected date
         const selectedDate =
           appointmentDate || new Date().toISOString().split("T")[0];
 
         const busyTimesForDate = selectedBarber.busyTimes
           .filter((bt: BusyTime) => {
-            // Extract date part only (YYYY-MM-DD) in UTC
             const busyDate = new Date(bt.start).toISOString().split("T")[0];
             return busyDate === selectedDate;
           })
           .map((bt: BusyTime) => {
-            // Convert UTC time back to local time by subtracting 3 hours
             const utcStartTime = new Date(bt.start);
             const hours = utcStartTime.getUTCHours();
             const minutes = utcStartTime.getUTCMinutes();
@@ -175,8 +168,6 @@ export default function AppointmentsPage() {
         return;
       }
 
-      // Frontend hour + 3 hours = UTC hour
-      // User selects 8:00 → send 11:00 UTC
       const [hours, minutes] = formData.appointmentTime.split(":");
       const utcHours = (parseInt(hours) + 3).toString().padStart(2, "0");
       const dateTime = new Date(
@@ -247,7 +238,6 @@ export default function AppointmentsPage() {
 
   return (
     <div className="min-h-screen bg-gray-950">
-      {/* Header */}
       <header className="bg-gray-900 border-b border-red-700/30 shadow-md ml-64">
         <div className="px-10 py-8">
           <h1 className="text-4xl font-bold text-white">Novo Agendamento</h1>
@@ -256,11 +246,8 @@ export default function AppointmentsPage() {
           </p>
         </div>
       </header>
-
-      {/* Main Content */}
       <main className="ml-64 py-16 px-8">
         <div className="w-full max-w-2xl">
-          {/* Form Card */}
           <div className="bg-gray-900 rounded-xl shadow-lg p-12 border border-gray-800">
             {successMessage && (
               <div className="mb-6 p-4 bg-green-500/20 border border-green-500/50 rounded-lg">
@@ -275,7 +262,6 @@ export default function AppointmentsPage() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Especialidade */}
               <div>
                 <label className="block text-sm font-semibold text-gray-300 mb-3">
                   Tipo de Serviço
@@ -295,8 +281,6 @@ export default function AppointmentsPage() {
                   ))}
                 </select>
               </div>
-
-              {/* Barbeiro */}
               <div>
                 <label className="block text-sm font-semibold text-gray-300 mb-3">
                   Selecione o Barbeiro
@@ -321,8 +305,6 @@ export default function AppointmentsPage() {
                   ))}
                 </select>
               </div>
-
-              {/* Data */}
               <div>
                 <label className="block text-sm font-semibold text-gray-300 mb-3">
                   Data do Agendamento
@@ -337,8 +319,6 @@ export default function AppointmentsPage() {
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                 />
               </div>
-
-              {/* Hora */}
               <div>
                 <label className="block text-sm font-semibold text-gray-300 mb-3">
                   Horário (8h às 18h - Intervalos de 30 min)
@@ -374,8 +354,6 @@ export default function AppointmentsPage() {
                   })}
                 </select>
               </div>
-
-              {/* Botões */}
               <div className="flex gap-4 pt-6 border-t border-gray-700">
                 <Link
                   href="/"
@@ -393,8 +371,6 @@ export default function AppointmentsPage() {
               </div>
             </form>
           </div>
-
-          {/* Info Section */}
           <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
               <div className="flex items-center gap-3 mb-3">

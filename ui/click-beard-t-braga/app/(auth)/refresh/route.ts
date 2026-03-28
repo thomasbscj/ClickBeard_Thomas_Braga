@@ -11,7 +11,6 @@ export async function GET() {
       redirect("/login");
     }
 
-    // Use the existing refreshAccessToken function
     await refreshAccessToken(refreshToken)
         .then(() => {
                 redirect("/");
@@ -19,7 +18,6 @@ export async function GET() {
                 redirect("/login");
         });
 
-    // If successful, redirect to home
     
   } catch (error) {
     console.error("Refresh token error:", error);

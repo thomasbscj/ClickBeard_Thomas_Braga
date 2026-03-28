@@ -26,8 +26,6 @@ export default function RegisterPage() {
       const email = emailRef.current?.value;
       const password = passwordRef.current?.value;
       const confirmPassword = confirmPasswordRef.current?.value;
-
-      // Validação básica
       if (!name || !email || !password || !confirmPassword) {
         setError("Por favor, preencha todos os campos");
         setIsLoading(false);
@@ -57,16 +55,12 @@ export default function RegisterPage() {
         setIsLoading(false);
         return;
       }
-
-      // Chamada de registro
       const response = await register(name, email, password);
 
       if (response) {
         setSuccess(
           "Cadastro realizado com sucesso! Redirecionando para login...",
         );
-
-        // Aguarda um pouco para mostrar a mensagem de sucesso
         setTimeout(() => {
           router.push("/login");
         }, 1500);
@@ -75,8 +69,6 @@ export default function RegisterPage() {
       const errorMessage =
         err instanceof Error ? err.message : "Erro ao fazer cadastro";
       console.error("Register error:", err);
-
-      // Trata diferentes tipos de erros
       if (
         errorMessage.includes("400") ||
         errorMessage.includes("already exists")
@@ -99,16 +91,14 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen w-full bg-linear-to-br from-gray-950 via-gray-900 to-gray-950 flex items-center justify-center">
-      {/* Background Effect */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-red-500/10 rounded-full blur-3xl"></div>
       </div>
 
-      {/* Register Container */}
       <div className="relative w-full max-w-md">
         <div className="bg-gray-900/80 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-gray-800/50">
-          {/* Logo Section */}
+
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold bg-linear-to-r from-blue-400 via-white to-red-400 bg-clip-text text-transparent mb-2">
               Click Beard
@@ -116,25 +106,19 @@ export default function RegisterPage() {
             <p className="text-gray-400 text-sm">Crie sua conta</p>
           </div>
 
-          {/* Form Section */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Error Message */}
             {error && (
               <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-red-400 text-sm">
                 <p className="font-semibold mb-1">❌ Erro</p>
                 <p>{error}</p>
               </div>
             )}
-
-            {/* Success Message */}
             {success && (
               <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 text-green-400 text-sm">
                 <p className="font-semibold mb-1">✓ Sucesso</p>
                 <p>{success}</p>
               </div>
             )}
-
-            {/* Name Field */}
             <div className="space-y-2">
               <label
                 htmlFor="name"
@@ -151,8 +135,6 @@ export default function RegisterPage() {
                 className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
-
-            {/* Email Field */}
             <div className="space-y-2">
               <label
                 htmlFor="email"
@@ -169,8 +151,6 @@ export default function RegisterPage() {
                 className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
-
-            {/* Password Field */}
             <div className="space-y-2">
               <label
                 htmlFor="password"
@@ -187,8 +167,6 @@ export default function RegisterPage() {
                 className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
-
-            {/* Confirm Password Field */}
             <div className="space-y-2">
               <label
                 htmlFor="confirmPassword"
@@ -205,8 +183,6 @@ export default function RegisterPage() {
                 className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700/50 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
-
-            {/* Register Button */}
             <button
               type="submit"
               disabled={isLoading}
@@ -222,15 +198,11 @@ export default function RegisterPage() {
               )}
             </button>
           </form>
-
-          {/* Divider */}
           <div className="my-6 flex items-center gap-4">
             <div className="flex-1 h-px bg-linear-to-r from-gray-800 to-transparent"></div>
             <span className="text-xs text-gray-500">OU</span>
             <div className="flex-1 h-px bg-linear-to-l from-gray-800 to-transparent"></div>
           </div>
-
-          {/* Login Link */}
           <p className="text-center text-gray-400 text-sm">
             Já tem uma conta?{" "}
             <Link
@@ -241,8 +213,6 @@ export default function RegisterPage() {
             </Link>
           </p>
         </div>
-
-        {/* Footer Info */}
         <p className="text-center text-gray-600 text-xs mt-6">
           Sistema seguro com autenticação encriptada
         </p>
