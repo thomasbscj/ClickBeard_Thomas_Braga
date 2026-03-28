@@ -14,22 +14,19 @@ const FRONTEND_URL = process.env.FRONTEND_URL;
 const HOST = process.env.MY_IP;
 const app = Express();
 
-// Security middleware
 const corsOptions = {
   origin: FRONTEND_URL,
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  maxAge: 86400, // 24 hours,
+  maxAge: 86400, 
   exposedHeaders: ["Set-Cookie"],
 };
 
-// Middleware
 app.use(cors(corsOptions));
-app.use(Express.json({ limit: "10kb" })); // Limit payload size
+app.use(Express.json({ limit: "10kb" })); 
 app.use(cookieParser());
 
-// Public Routes (no authentication required)
 app.use("/api/auth", authRouter);
 
 // Health check
@@ -37,7 +34,6 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK" });
 });
 
-// Protected Routes (require authentication)
 app.use("/api/users", authMiddleware, userRouter);
 app.use("/api/barbers", authMiddleware, barberRouter);
 app.use("/api/specialties", authMiddleware, specialtyRouter);

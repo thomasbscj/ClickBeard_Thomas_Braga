@@ -8,10 +8,10 @@ export type BusyTime = {
 export type Barber = {
   id: number;
   name: string;
-  specialties: string[]; // Array de nomes de especialidades
+  specialties: string[]; 
   bornAt: number;
   hiredAt: Date;
-  busyTimes?: BusyTime[]; // Array de horários em que o barbeiro está ocupado
+  busyTimes?: BusyTime[]; 
 };
 
 export type BarberCreateInput = Omit<Barber, "id">;

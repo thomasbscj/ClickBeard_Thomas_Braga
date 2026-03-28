@@ -16,7 +16,6 @@ class BarberRepository implements IBarberRepository {
   constructor() {}
 
   async createBarber(barber: BarberCreateInput): Promise<Barber> {
-    // Create barber and associate specialties
     const createdBarber = await (db.barber.create as any)({
       data: {
         name: barber.name,
@@ -46,8 +45,7 @@ class BarberRepository implements IBarberRepository {
       },
     });
 
-    // Calculate busy times from appointments (will be empty for new barber)
-    const APPOINTMENT_DURATION = 30; // minutes
+    const APPOINTMENT_DURATION = 30;
     const busyTimes = createdBarber.appointments.map((apt: any) => ({
       start: new Date(apt.datetime),
       end: new Date(apt.datetime.getTime() + APPOINTMENT_DURATION * 60000),
@@ -88,9 +86,7 @@ class BarberRepository implements IBarberRepository {
       throw new Error("Barber not found");
     }
 
-    // Calculate busy times from appointments
-    // Each appointment occupies 30 minutes
-    const APPOINTMENT_DURATION = 30; // minutes
+    const APPOINTMENT_DURATION = 30; 
     const busyTimes = barber.appointments.map((apt: any) => ({
       start: new Date(apt.datetime),
       end: new Date(apt.datetime.getTime() + APPOINTMENT_DURATION * 60000),
@@ -132,7 +128,7 @@ class BarberRepository implements IBarberRepository {
       db.barber.count(),
     ]);
 
-    const APPOINTMENT_DURATION = 30; // minutes
+    const APPOINTMENT_DURATION = 30; 
     return {
       data: barbers.map((barber: any) => ({
         id: barber.id,
@@ -154,7 +150,6 @@ class BarberRepository implements IBarberRepository {
   }
 
   async updateBarber(barber: Barber): Promise<Barber> {
-    // Delete existing specialty associations
     const dbAny = db as any;
     await dbAny.barberSpecialty.deleteMany({
       where: {
@@ -162,7 +157,6 @@ class BarberRepository implements IBarberRepository {
       },
     });
 
-    // Update barber and create new specialty associations
     const updatedBarber = await (db.barber.update as any)({
       where: {
         id: barber.id,
@@ -195,8 +189,7 @@ class BarberRepository implements IBarberRepository {
       },
     });
 
-    // Calculate busy times from appointments
-    const APPOINTMENT_DURATION = 30; // minutes
+    const APPOINTMENT_DURATION = 30; 
     const busyTimes = updatedBarber.appointments.map((apt: any) => ({
       start: new Date(apt.datetime),
       end: new Date(apt.datetime.getTime() + APPOINTMENT_DURATION * 60000),

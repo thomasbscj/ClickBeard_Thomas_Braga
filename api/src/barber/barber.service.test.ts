@@ -4,7 +4,6 @@ import type { IBarberRepository } from "./barber.repository";
 import { PaginatedResponse } from "../types/types";
 import { BarberService } from "./barber.service";
 
-// Mock hardcoded do repositório de Barber
 const mockBarberRepository: IBarberRepository = {
   createBarber: async (barber: BarberCreateInput): Promise<Barber> => {
     return {

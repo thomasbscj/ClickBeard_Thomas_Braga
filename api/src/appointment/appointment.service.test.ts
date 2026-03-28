@@ -4,7 +4,6 @@ import type { IAppointmentRepository } from "./appointment.repository";
 import { AppointmentService } from "./appointment.service";
 import type { PaginationParams, PaginatedResponse } from "../types/types";
 
-// Mock hardcoded do repositório de Appointment
 const mockAppointmentRepository: IAppointmentRepository = {
   createAppointment: async (appointment: Appointment): Promise<Appointment> => {
     return {
@@ -27,8 +26,6 @@ const mockAppointmentRepository: IAppointmentRepository = {
       };
     }
     if (id === 4) {
-      // Appointment in 1 hour from mock current time (2026-03-24T12:00:00)
-      // So it's less than 2 hours, should fail cancellation
       return {
         id: 4,
         userId: 3,
@@ -38,7 +35,6 @@ const mockAppointmentRepository: IAppointmentRepository = {
       };
     }
     if (id === 5) {
-      // Future appointment for cancelAppointment tests (plenty of time)
       return {
         id: 5,
         userId: 1,
@@ -168,7 +164,6 @@ describe("AppointmentService", () => {
   let appointmentService: AppointmentService;
 
   beforeEach(() => {
-    // Mock getCurrentDate to return a fixed date: 2026-03-24T12:00:00
     const mockGetCurrentDate = () => new Date("2026-03-24T12:00:00");
     appointmentService = new AppointmentService(
       mockAppointmentRepository,
@@ -433,9 +428,6 @@ describe("AppointmentService", () => {
 
   describe("getPastAppointments", () => {
     it("should return only past appointments (before today at 00:00:00)", async () => {
-      // Current mocked time: 2026-03-24T12:00:00
-      // Today at midnight: 2026-03-24T00:00:00
-      // All test appointments are on or after 2026-03-24, so no past appointments
       const result = await appointmentService.getPastAppointments();
 
       expect(result).toBeDefined();
@@ -458,9 +450,6 @@ describe("AppointmentService", () => {
 
   describe("getUpcomingAppointments", () => {
     it("should return only upcoming appointments (from today at 00:00:00 onwards)", async () => {
-      // Current mocked time: 2026-03-24T12:00:00
-      // Today at midnight: 2026-03-24T00:00:00
-      // Appointments 1, 2, 3, 4 are all on or after 2026-03-24T00:00:00
       const result = await appointmentService.getUpcomingAppointments();
 
       expect(result).toBeDefined();
@@ -536,7 +525,6 @@ describe("AppointmentService", () => {
 
   describe("cancelAppointment", () => {
     it("should cancel appointment with sufficient notice", async () => {
-      // Appointment 5 is 2026-04-01, plenty of time to cancel from 2026-03-24
       const result = await appointmentService.cancelAppointment(5, 1);
 
       expect(result).toBeDefined();
@@ -550,9 +538,6 @@ describe("AppointmentService", () => {
     });
 
     it("should require at least 2 hours notice", async () => {
-      // Current mocked time: 2026-03-24T12:00:00
-      // Appointment 4 is 2026-03-24T13:00:00 (only 1 hour away)
-      // So it should throw an error because it doesn't have 2+ hours notice
       await expect(appointmentService.cancelAppointment(4, 3)).rejects.toThrow(
         "Appointments must be cancelled at least 2 hours in advance",
       );

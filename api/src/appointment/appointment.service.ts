@@ -47,7 +47,6 @@ export class AppointmentService implements IAppointmentService {
     } else if (minutes <= 45) {
       rounded.setMinutes(30, 0, 0);
     } else {
-      // minutes > 45, round to next hour
       rounded.setHours(rounded.getHours() + 1);
       rounded.setMinutes(0, 0, 0);
     }
@@ -56,11 +55,8 @@ export class AppointmentService implements IAppointmentService {
   }
 
   private isWithinBusinessHours(datetime: Date): boolean {
-    // Business hours in São Paulo (UTC-3): 8:00-17:30
-    // Converted to UTC: 11:00-20:30
     const hour = datetime.getUTCHours();
     const minutes = datetime.getUTCMinutes();
-    // Allow 11:00-20:29 UTC (8:00-17:29 UTC-3)
     const isAtOrAfter11 = hour >= 11;
     const isBeforeOrAt20_30 = hour < 20 || (hour === 20 && minutes <= 30);
 
@@ -186,7 +182,6 @@ export class AppointmentService implements IAppointmentService {
     pagination?: PaginationParams,
   ): Promise<PaginatedResponse<Appointment>> {
     const now = this.getCurrentDate();
-    // Get today at 00:00:00
     const todayAtMidnight = new Date(now);
     todayAtMidnight.setHours(0, 0, 0, 0);
 
@@ -216,7 +211,6 @@ export class AppointmentService implements IAppointmentService {
     const allAppointments =
       await this.appointmentRepository.getAllAppointments();
 
-    // Sort by datetime in descending order (newest first)
     const sortedAppointments = [...allAppointments.data].sort(
       (a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime(),
     );

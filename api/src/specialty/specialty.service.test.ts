@@ -4,7 +4,6 @@ import type { ISpecialtyRepository } from "./specialty.repository";
 import { PaginatedResponse } from "../types/types";
 import { SpecialtyService } from "./specialty.service";
 
-// Mock hardcoded do repositório de Specialty
 const mockSpecialtyRepository: ISpecialtyRepository = {
   createSpecialty: async (specialty: Specialty): Promise<Specialty> => {
     return {

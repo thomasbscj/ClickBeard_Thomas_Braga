@@ -20,7 +20,6 @@ export type UserSecure = {
   Role: UserRole;
 };
 
-// DTOs
 export const userCreateDto = z.object({
   Name: z.string().min(1, "Name is required"),
   email: z.email("Invalid email"),
@@ -39,7 +38,6 @@ export const userUpdateDto = z.object({
 export type UserCreateDto = z.infer<typeof userCreateDto>;
 export type UserUpdateDto = z.infer<typeof userUpdateDto>;
 
-// Validator functions
 export const validateUserCreate = (data: unknown) => {
   return userCreateDto.parse(data);
 };

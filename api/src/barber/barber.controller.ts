@@ -14,7 +14,6 @@ import { adminMiddleware } from "../middleware/adminMiddleware";
 
 export const barberRouter = Router();
 
-// Get Barber by ID
 barberRouter.get("/:id", async (req: Request, res: Response) => {
   try {
     const id = parseIntParam(req.params.id);
@@ -27,7 +26,6 @@ barberRouter.get("/:id", async (req: Request, res: Response) => {
   }
 });
 
-// Get All Barbers
 barberRouter.get("/", async (req: Request, res: Response) => {
   try {
     const { limit, offset } = parsePaginationParams(
@@ -60,7 +58,6 @@ barberRouter.post("/", async (req: Request, res: Response) => {
   }
 });
 
-// Update Barber
 barberRouter.put("/:id", async (req: Request, res: Response) => {
   try {
     const id = parseIntParam(req.params.id);
@@ -83,7 +80,6 @@ barberRouter.put("/:id", async (req: Request, res: Response) => {
   }
 });
 
-// Delete Barber
 barberRouter.delete("/:id", async (req: Request, res: Response) => {
   try {
     const id = parseIntParam(req.params.id);

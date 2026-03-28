@@ -3,7 +3,6 @@ import { appointmentService } from "./appointment.service";
 import {
   Appointment,
   validateAppointmentCreate,
-  validateAppointmentUpdate,
 } from "./appointment.model";
 import {
   handleValidationError,
@@ -14,7 +13,6 @@ import { adminMiddleware } from "../middleware/adminMiddleware";
 
 export const appointmentRouter = Router();
 
-// Create Appointment
 appointmentRouter.post("/", async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
@@ -35,7 +33,6 @@ appointmentRouter.post("/", async (req: Request, res: Response) => {
   } catch (error) {
     if (handleValidationError(error, res)) return;
 
-    // Handle business logic errors with 400
     if (
       error instanceof Error &&
       (error.message.includes("Appointments must be scheduled between") ||
@@ -86,7 +83,6 @@ appointmentRouter.post("/:id/cancel", async (req: Request, res: Response) => {
   }
 });
 
-// Get My Appointments
 appointmentRouter.get(
   "/my-appointments",
   async (req: Request, res: Response) => {
@@ -114,7 +110,6 @@ appointmentRouter.get(
   },
 );
 
-// Get All Appointments (ADMIN ONLY)
 appointmentRouter.get(
   "/",
   adminMiddleware,
@@ -136,7 +131,6 @@ appointmentRouter.get(
   },
 );
 
-// Get Appointment by ID (ADMIN ONLY)
 appointmentRouter.get(
   "/:id",
   adminMiddleware,
@@ -153,7 +147,6 @@ appointmentRouter.get(
   },
 );
 
-// Delete Appointment (ADMIN ONLY)
 appointmentRouter.delete(
   "/:id",
   adminMiddleware,

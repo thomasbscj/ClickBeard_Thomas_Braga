@@ -11,7 +11,6 @@ import { UserRole } from "../user/user.model";
 
 const NODE_ENV = process.env.NODE_ENV || "development";
 
-// Secure cookie options
 const secureCookieOptions = {
   httpOnly: true,
   secure: false,
@@ -21,17 +20,16 @@ const secureCookieOptions = {
 
 const accessTokenCookieOptions = {
   ...secureCookieOptions,
-  maxAge: 60 * 60 * 1000, // 1 hour
+  maxAge: 60 * 60 * 1000, 
 };
 
 const refreshTokenCookieOptions = {
   ...secureCookieOptions,
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  maxAge: 7 * 24 * 60 * 60 * 1000, 
 };
 
 export const authRouter = Router();
 
-// Login route
 authRouter.post("/login", async (req: Request, res: Response) => {
   try {
     const validatedData = validateLogin(req.body);
@@ -40,7 +38,6 @@ authRouter.post("/login", async (req: Request, res: Response) => {
       validatedData.password,
     );
 
-    // Set tokens as secure HttpOnly cookies
     res.cookie("accessToken", authResponse.token, accessTokenCookieOptions);
     res.cookie(
       "refreshToken",
@@ -66,9 +63,6 @@ authRouter.post("/login", async (req: Request, res: Response) => {
   }
 });
 
-// Register route
-// Note: This endpoint only creates a new user without logging in
-// Users must use the /login endpoint to obtain authentication tokens
 authRouter.post("/register", async (req: Request, res: Response) => {
   try {
     const validatedData = validateRegister(req.body);
@@ -91,7 +85,6 @@ authRouter.post("/register", async (req: Request, res: Response) => {
   }
 });
 
-// Refresh token route
 authRouter.post("/refresh", async (req: Request, res: Response) => {
   try {
     const validatedData = validateRefreshToken(req.body);
@@ -99,7 +92,6 @@ authRouter.post("/refresh", async (req: Request, res: Response) => {
       validatedData.refreshToken,
     );
 
-    // Update cookies with new tokens
     res.cookie("accessToken", response.token, accessTokenCookieOptions);
     res.cookie(
       "refreshToken",
@@ -124,7 +116,6 @@ authRouter.post("/refresh", async (req: Request, res: Response) => {
   }
 });
 
-// Logout route
 authRouter.post(
   "/logout",
   authMiddleware,
@@ -133,7 +124,6 @@ authRouter.post(
       const validatedData = validateRefreshToken(req.body);
       await authService.logout(validatedData.refreshToken);
 
-      // Clear cookies
       res.clearCookie("accessToken");
       res.clearCookie("refreshToken");
 
@@ -146,7 +136,6 @@ authRouter.post(
   },
 );
 
-// Logout all sessions route
 authRouter.post(
   "/logout-all",
   authMiddleware,
@@ -161,7 +150,6 @@ authRouter.post(
 
       await authService.logoutAll(userId);
 
-      // Clear cookies
       res.clearCookie("accessToken");
       res.clearCookie("refreshToken");
 

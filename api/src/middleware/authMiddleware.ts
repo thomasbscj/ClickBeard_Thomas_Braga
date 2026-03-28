@@ -25,7 +25,6 @@ export const authMiddleware = (
   next: NextFunction,
 ) => {
   try {
-    // Try to get token from Authorization header first (for API clients)
     let token = null;
     const authHeader = req.headers.authorization;
 
@@ -33,7 +32,6 @@ export const authMiddleware = (
       token = authHeader.substring(7);
     }
 
-    // Fall back to cookie if header not provided (for browser clients)
     if (!token && (req.cookies as any).accessToken) {
       token = (req.cookies as any).accessToken;
     }

@@ -4,7 +4,6 @@ import type { IUserRepository } from "./user.repository";
 import { PaginatedResponse } from "../types/types";
 import { UserService } from "./user.service";
 
-// Mock hardcoded do repositório de User
 const mockUserRepository: IUserRepository = {
   createUser: async (user: User): Promise<User> => {
     return {
